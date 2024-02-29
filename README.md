@@ -8,3 +8,5 @@ Multitool for working with radio signals, based on FlipperZero on the basis of e
 You can suggest changes or additional features
 
 
+## After assembling
+После создания вам нужно откалибровать кнопки и резистивный делитель для вывода напряжения на аккумуляторе
