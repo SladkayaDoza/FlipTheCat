@@ -75,6 +75,15 @@ String setName(char* title) {
   }
 }
 
+int countNumber(int cnt) {
+  int n = 0;
+  while (cnt > 0) {
+    cnt /= 10;
+    n++;
+  }
+  return n;
+}
+
 int setNumber(char* title, int count) {
   static uint8_t pointer = 0;
   tk();
@@ -113,10 +122,12 @@ int setNumber(char* title, int count) {
     }
     if (up.click()) {
       outCnt += pow(10, n - pointer - 1);
+      n = countNumber(outCnt);
       updOled = true;
     }
     if (down.click()) {
       outCnt -= pow(10, n - pointer - 1);
+      n = countNumber(outCnt);
       updOled = true;
     }
     if (left.click()) {
