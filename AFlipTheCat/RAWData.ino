@@ -37,7 +37,7 @@ void RecordSignal(uint8_t pointer, JsonObject sens) {
 
   String name = setName("SetName");
   sens[point]["name"] = name;
-  sens[point]["frequency"] = mainFrequency;
+  sens[point]["frequency"] = FrequencyPointer;
 }
 // передать json лист
 

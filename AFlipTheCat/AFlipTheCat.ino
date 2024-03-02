@@ -34,7 +34,10 @@ unsigned long store1 = 0;
 uint8_t bitR1 = 0;
 uint8_t protoc = 0;
 
-float mainFrequency = 433.92;
+// float mainFrequency = 433.92;
+// SETTINGS
+uint8_t FrequencyPointer = 9;
+int start12bitBruteForce = 1;
 
 uint8_t pinsCount = 4;         // numPins + 1 -- this value is pins + main Available pins
 const uint8_t pinsCounts = 3;  // numPins + 1 -- this value is pins + main Available pins
@@ -85,7 +88,7 @@ char* main_lay[8] = {
   "RC 12bit bruteForce",
   "BLUETOOTH",
   "GPIO",
-  "",
+  "Settings",
   "",
 };
 char* blue_lay[8] = {
@@ -104,7 +107,7 @@ void setupRx() {
   ELECHOUSE_cc1101.Init();
   // ELECHOUSE_cc1101.setRxBW(812.50);
   ELECHOUSE_cc1101.setRxBW(256);
-  ELECHOUSE_cc1101.setMHZ(mainFrequency);
+  ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
   // if (!RxTxMode) {
   pinMode(RCPin, INPUT);
   mySwitch.disableTransmit();
@@ -115,7 +118,7 @@ void setupRx() {
 }
 void setupTx() {
   ELECHOUSE_cc1101.Init();
-  ELECHOUSE_cc1101.setMHZ(mainFrequency);
+  ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
   // if (RxTxMode) {
   pinMode(RCPin, OUTPUT);
   mySwitch.disableReceive();
@@ -147,7 +150,7 @@ void setup() {
   }
 
   ELECHOUSE_cc1101.Init();
-  ELECHOUSE_cc1101.setMHZ(mainFrequency);
+  ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
   // ELECHOUSE_cc1101.setRxBW(58);
   mySwitch.enableReceive(RCPin);
   // mySwitch.setPulseLength();
@@ -209,11 +212,11 @@ void mainn() {
     }
 
     // ||||| Кнопки |||||
-    if (up.click() or up.hold()) {
+    if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 0, ITEMS - 1);
       displayUpdate = 1;
     }
-    if (down.click() or down.hold()) {
+    if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 0, ITEMS - 1);
       displayUpdate = 1;
     }
@@ -228,7 +231,7 @@ void mainn() {
           break;
         case 4: bluetoothLay(); break;
         case 5: gpioLay(); break;
-        case 6: nothing(); break;
+        case 6: settings(); break;
         case 7: nothing(); break;
       }
       displayUpdate = 1;
@@ -770,7 +773,7 @@ void func_reciv(uint8_t cutr) {
     mStr = def;
   }
   objectRC[j]["name"] = mStr;
-  objectRC[j]["frequency"] = mainFrequency;
+  objectRC[j]["frequency"] = FrequencyPointer;
   objectRC[j]["data"] = store1;
   objectRC[j]["bytes"] = bitR1;
 
@@ -784,13 +787,13 @@ void rc12bitBruteForce() {
   oled.clear();
   oled.home();
   oled.print("Rc 12bit brute force");
-  oled.setCursor(0, 4);
-  oled.print("        0/4096      ");
+  // oled.setCursor(0, 4);
+  // oled.print("        0/4096      ");
   oled.update();
 
   uint8_t byt = 12;
   int iy = 1;
-  for (int i = 1; i < 4096; i++) {
+  for (int i = start12bitBruteForce; i < 4096; i++) {
     tk();
     if (back.click() or back.hold()) {
 
