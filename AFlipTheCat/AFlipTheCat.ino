@@ -280,11 +280,11 @@ void rawLay() {
       updDisplay = 1;
     }
 
-    if (up.click() or up.hold()) {
+    if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 0, RC_ITEMS - 1);
       updDisplay = 1;
     }
-    if (down.click() or down.hold()) {
+    if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 0, RC_ITEMS - 1);
       updDisplay = 1;
     }
@@ -334,11 +334,11 @@ void rawMenu(uint8_t pointer1) {
       printPointer(pointer);
       oled.update();
     }
-    if (up.click() or up.hold()) {
+    if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 2, 3);
       updDisplay = 1;
     }
-    if (down.click() or down.hold()) {
+    if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 2, 3);
       updDisplay = 1;
     }
@@ -385,11 +385,11 @@ void rcLay() {
     }
 
 
-    if (up.click() or up.hold()) {
+    if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 0, RC_ITEMS - 1);
       displayUpdate = 1;
     }
-    if (down.click() or down.hold()) {
+    if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 0, RC_ITEMS - 1);
       displayUpdate = 1;
     }
@@ -529,11 +529,11 @@ void bluetoothLay() {
       oled.update();
     }
 
-    if (up.click() or up.hold()) {
+    if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 0, ITEMS - 1);
       displayUpdate = 1;
     }
-    if (down.click() or down.hold()) {
+    if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 0, ITEMS - 1);
       displayUpdate = 1;
     }
@@ -597,11 +597,11 @@ void menuRc(uint8_t pointer1) {
       oled.update();
     }
 
-    if (up.click() or up.hold()) {
+    if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 3, 5);
       updDisplay = true;
     }
-    if (down.click() or down.hold()) {
+    if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 3, 5);
       updDisplay = true;
     }
@@ -659,11 +659,11 @@ void deleteRC(int pointer1) {
       }
     }
 
-    if (up.click() or up.hold()) {
+    if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 1, 2);
       updDisplay = true;
     }
-    if (down.click() or down.hold()) {
+    if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 1, 2);
       updDisplay = true;
     }
