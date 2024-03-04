@@ -265,7 +265,7 @@ void rawLay() {
 
     if (ok.click() or ok.hold()) {
       String j = String(pointer);
-      if (!objectDoc[j]["RawData"].as<JsonArray>().isNull()) {
+      if (!objectDoc[j]["RawData"].isNull()) {
         digitalWrite(led_pin, HIGH);
 
         oled.clear();
