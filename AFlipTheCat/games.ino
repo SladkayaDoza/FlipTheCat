@@ -61,6 +61,7 @@ void printBoard(int board[boardSize][boardSize]) {
 
 void game2048() {
   bool updDisplay = 1;
+  bool out = 0;
   int score = 0;
   tk();
   int board[boardSize][boardSize] = {
@@ -102,10 +103,15 @@ void game2048() {
       addRandomTile(board);
       updDisplay = 1;
     }
-    if (back.click() or back.hold()) break;
+    if (back.click() or back.hold()) {
+      out = 1;
+      break;
+    }
   }
-  delay(2500);
-  
+  if (!out) {
+    delay(2500);
+  }
+
   score = countTiles(board);
   updDisplay = 1;
   while (1) {
@@ -117,7 +123,7 @@ void game2048() {
       oled.print("Game Over!");
       oled.setCursor(0, 1);
       oled.print("Score: ");
-      // oled.print();  // score
+      oled.print(score);
       oled.update();
     }
     if (back.click() or back.hold()) break;
@@ -133,7 +139,7 @@ int countTiles(int board[boardSize][boardSize]) {
   for (int i = 0; i < boardSize; ++i) {
     for (int j = 0; j < boardSize; ++j) {
       if (board[i][j] != 0) {
-        count++;
+        count += board[i][j];
       }
     }
   }
