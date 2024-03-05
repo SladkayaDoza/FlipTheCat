@@ -61,14 +61,18 @@ void printBoard(int board[boardSize][boardSize]) {
 
 void game2048() {
   bool updDisplay = 1;
+  int score = 0;
   tk();
   int board[boardSize][boardSize] = {
-    { 2, 0, 2, 4 },
-    { 4, 2, 0, 8 },
-    { 0, 4, 2, 2 },
-    { 2, 8, 4, 0 }
+    { 0, 0, 0, 0 },
+    { 0, 0, 0, 0 },
+    { 0, 0, 0, 0 },
+    { 0, 0, 0, 0 }
   };
-  while (1) {
+  addRandomTile(board);
+  addRandomTile(board);
+
+  while (canMove(board)) {
     tk();
     if (updDisplay) {
       updDisplay = 0;
@@ -100,7 +104,9 @@ void game2048() {
     }
     if (back.click() or back.hold()) break;
   }
-
+  delay(2500);
+  
+  score = countTiles(board);
   updDisplay = 1;
   while (1) {
     tk();
@@ -122,7 +128,17 @@ void game2048() {
   }
 }
 
-
+int countTiles(int board[boardSize][boardSize]) {
+  int count = 0;
+  for (int i = 0; i < boardSize; ++i) {
+    for (int j = 0; j < boardSize; ++j) {
+      if (board[i][j] != 0) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
 
 void moveLeft(int board[boardSize][boardSize]) {
   for (int i = 0; i < boardSize; ++i) {
