@@ -52,6 +52,8 @@ int minRssi = -68;
 bool RECORDING_SIGNAL = false;
 bool RxTxMode = true;
 
+const int boardSize = 4;
+
 //  RAW DATA
 DynamicJsonDocument doc(4000);
 JsonObject objectDoc = doc.createNestedObject("sensorData");
@@ -89,7 +91,7 @@ char* main_lay[8] = {
   "BLUETOOTH",
   "GPIO",
   "Settings",
-  "",
+  "Games",
 };
 char* blue_lay[8] = {
   "Keyboard",
@@ -206,7 +208,7 @@ void mainn() {
       volt += analogRead(35);
       volt += analogRead(35);
       volt /= 4;
-      oled.print(volt * 0.00179);
+      oled.print(volt * 3.26 * 2.25 / 4096);  // volt * 3.26 * ((r1 + r2) / r2) / 4096
       printPointer(pointer);
       oled.update();
     }
@@ -232,7 +234,7 @@ void mainn() {
         case 4: bluetoothLay(); break;
         case 5: gpioLay(); break;
         case 6: settings(); break;
-        case 7: nothing(); break;
+        case 7: games(); break;
       }
       displayUpdate = 1;
     }
