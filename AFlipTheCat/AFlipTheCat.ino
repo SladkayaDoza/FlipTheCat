@@ -48,9 +48,48 @@ int OutPinModeG[pinsCounts];
 float signalDetectionFrequencies[SIGNAL_DETECTION_FREQUENCIES_LENGTH] = { 300.00, 303.87, 304.25, 310.00, 315.00, 318.00, 390.00, 418.00, 433.07, 433.92, 434.42, 434.77, 438.90, 868.3, 868.35, 868.865, 868.95, 915.00, 925.00 };
 int detectedRssi = -100;
 float detectedFrequency = 0.0;
-int minRssi = -68;
+int fineRssi = -100;
+float fineFrequency = 0.0;
+int minRssi = -75;
 bool RECORDING_SIGNAL = false;
 bool RxTxMode = true;
+
+
+// v2 freq analyzer
+static const uint32_t subghz_frequency_list[] = {
+  /* 300 - 348 */
+  // 300000000,
+  303875000,
+  304250000,
+  310000000,
+  315000000,
+  318000000,
+
+  /* 387 - 464 */
+  390000000,
+  418000000,
+  433075000,
+  433420000,
+  433920000,
+  434420000,
+  434775000,
+  438900000,
+
+  /* 779 - 928 */
+  868350000,
+  915000000,
+  925000000
+};
+
+typedef struct
+{
+  uint32_t frequency_coarse;
+  int rssi_coarse;
+  uint32_t frequency_fine;
+  int rssi_fine;
+} FrequencyRSSI;
+const int rssi_threshold = -70;
+
 
 const int boardSize = 4;
 
@@ -416,11 +455,13 @@ void rcLay() {
 
 void detectSignal() {
   setupRx();
-  ELECHOUSE_cc1101.setRxBW(256);
+  ELECHOUSE_cc1101.setRxBW(64);
   byte signalDetected = 0;
   bool changed = false;
   detectedRssi = -100;
   detectedFrequency = 0.0;
+  fineRssi = -100;
+  fineFrequency = 0.0;
   oled.clear();
   oled.home();
   oled.print("Frequency Analyzer..");
@@ -451,7 +492,7 @@ void detectSignal() {
       oled.update();
     }
     detectedRssi = -100;
-    // ITERATE FREQUENCIES
+
     for (float fMhz : signalDetectionFrequencies) {
       ELECHOUSE_cc1101.setMHZ(fMhz);
       int rssi = ELECHOUSE_cc1101.getRssi();
@@ -471,6 +512,17 @@ void detectSignal() {
 
     if (detectedRssi >= minRssi) {
 
+      for (float i = detectedFrequency - 0.3; i < detectedFrequency + 0.3; i += 0.02) {
+        float frequency = i;
+        ELECHOUSE_cc1101.setMHZ(frequency);
+        int rssi = ELECHOUSE_cc1101.getRssi();
+
+        if (rssi >= fineRssi) {
+          fineRssi = rssi;
+          fineFrequency = frequency;
+        }
+      }
+
       signalDetected++;
 
       // DEBUG
@@ -479,11 +531,20 @@ void detectSignal() {
       Serial.print(" RSSI: ");
       Serial.println(detectedRssi);
 
+      Serial.print("Fine MHZ: ");
+      Serial.print(fineFrequency);
+      Serial.print(" Fine RSSI: ");
+      Serial.println(fineRssi);
+
       oled.setCursor(0, 1 + signalDetected);
-      oled.print("MHZ: ");
+      // oled.print("M: ");
       oled.print(detectedFrequency);
-      oled.print(" RSSI: ");
-      oled.println(detectedRssi);
+      oled.print(",");
+      oled.print(detectedRssi);
+      oled.print(" ");
+      oled.print(fineFrequency);
+      oled.print(",");
+      oled.println(fineRssi);
       oled.update();
       delay(1);
     }
