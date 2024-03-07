@@ -1,18 +1,20 @@
-void saveJsonToFile(char* filename, DynamicJsonDocument& docs) {
+void saveJsonToFile(char* filename, JsonDocument& docs) {
   File file = SPIFFS.open(filename, "w");
   if (!file) {
     Serial.println("Не удалось открыть файл для записи");
     // return;
   }
-
-  serializeJson(docs, file);
+  String buffer;
+  serializeJson(docs, buffer);
+  file.print(buffer);
   file.close();
   Serial.println("JSON успешно сохранен в файл");
-  // serializeJson(docs, Serial);
+  serializeJson(docs, Serial);
   Serial.println();
+  Serial.print(buffer);
 }
 
-void readJsonFromFile(char* filename, DynamicJsonDocument& docs) {
+void readJsonFromFile(char* filename, JsonDocument& docs) {
   File file = SPIFFS.open(filename, "r");
   if (!file) {
     Serial.println("Файл не найден, создаем новый");

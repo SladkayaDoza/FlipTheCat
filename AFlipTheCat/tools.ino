@@ -56,19 +56,19 @@ String setName(char* title) {
       // }
       return String("tmp - ") + random(100000, 999999);
     }
-    if (up.click()) {
+    if (up.click() or up.step()) {
       pointerY = constrain(pointerY - 1, 0, 2);
       updOled = true;
     }
-    if (down.click()) {
+    if (down.click() or down.step()) {
       pointerY = constrain(pointerY + 1, 0, 2);
       updOled = true;
     }
-    if (left.click()) {
+    if (left.click() or left.step()) {
       pointerX = constrain(pointerX - 1, 0, 10);
       updOled = true;
     }
-    if (right.click()) {
+    if (right.click() or right.step()) {
       pointerX = constrain(pointerX + 1, 0, 10);
       updOled = true;
     }

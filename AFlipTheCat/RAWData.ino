@@ -18,7 +18,7 @@ void RecordSignal(uint8_t pointer, JsonObject sens) {
   oled.print("Recording..");
   oled.update();
 
-  JsonArray sensorArray = sens[point].createNestedArray("RawData");
+  JsonArray sensorArray = sens[point]["RawData"].to<JsonArray>();
 
   int i, transitions = 0;
   long lastRecordDuration = 0;

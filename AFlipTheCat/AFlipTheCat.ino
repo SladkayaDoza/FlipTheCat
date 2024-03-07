@@ -58,7 +58,7 @@ bool RxTxMode = true;
 // v2 freq analyzer
 static const uint32_t subghz_frequency_list[] = {
   /* 300 - 348 */
-  // 300000000,
+  300000000,
   303875000,
   304250000,
   310000000,
@@ -94,9 +94,10 @@ const int rssi_threshold = -70;
 const int boardSize = 4;
 
 //  RAW DATA
-DynamicJsonDocument doc(4000);
-JsonObject objectDoc = doc.createNestedObject("sensorData");
-JsonObject objectRC = doc.createNestedObject("data");
+JsonDocument doc;
+JsonDocument docRC;
+JsonObject objectDoc = doc["sensorData"].add<JsonObject>();
+JsonObject objectRC = docRC["data"].add<JsonObject>();
 
 class OUTPIN {
 public:
@@ -211,16 +212,12 @@ void setup() {
   }
 
   readJsonFromFile("/raw.json", doc);
-  Serial.println();
-  // readJsonFromFile("/raw.json", docRC);
-  // Serial.println();
+  readJsonFromFile("/rc.json", docRC);
+  Serial.println("ready");
 
   // first start - ".as" to ".to"
   objectDoc = doc["sensorData"].as<JsonObject>();  // frequency, name, RawData[]
-  objectRC = doc["data"].as<JsonObject>();         // frequency, name, data, bytes
-
-  // serializeJson(docRC, Serial);
-  // Serial.println();
+  objectRC = docRC["data"].as<JsonObject>();         // frequency, name, data, bytes
 }
 
 void loop() {
@@ -740,13 +737,13 @@ void reNameRC(int pointer) {
     return;
   }
   objectRC[j]["name"] = mStr;
-  saveJsonToFile("/raw.json", doc);
+  saveJsonToFile("/rc.json", docRC);
 }
 
 void changeRC(int pointer) {
   String j = String(pointer);
   objectRC[j]["data"] = setNumber("Change code", objectRC[j]["data"]);
-  saveJsonToFile("/raw.json", doc);
+  saveJsonToFile("/rc.json", docRC);
 
   // int data = setNumber("Change code", save_data.data_prog[pointer]);
   // save_data.data_prog[pointer] = data;
@@ -758,7 +755,7 @@ void changeRC(int pointer) {
 void select_deleteRc(uint8_t pointer) {
   String j = String(pointer);
   objectRC.remove(j);
-  saveJsonToFile("/raw.json", doc);
+  saveJsonToFile("/rc.json", docRC);
   // save_data.data_prog[pointer] = 0;
   // save_data.data_prog1[pointer] = 0;
   // trans_lay[pointer] = "__";
@@ -840,7 +837,7 @@ void func_reciv(uint8_t cutr) {
   objectRC[j]["data"] = store1;
   objectRC[j]["bytes"] = bitR1;
 
-  saveJsonToFile("/raw.json", doc);
+  saveJsonToFile("/rc.json", docRC);
 }
 
 
