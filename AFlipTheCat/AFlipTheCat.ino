@@ -36,7 +36,7 @@ uint8_t protoc = 0;
 
 // float mainFrequency = 433.92;
 // SETTINGS
-uint8_t FrequencyPointer = 9;
+uint8_t FrequencyPointer = 10;
 int start12bitBruteForce = 1;
 
 uint8_t pinsCount = 4;         // numPins + 1 -- this value is pins + main Available pins
@@ -44,8 +44,8 @@ const uint8_t pinsCounts = 3;  // numPins + 1 -- this value is pins + main Avail
 int OutPinModeG[pinsCounts];
 
 // SINGAL DETECTION
-#define SIGNAL_DETECTION_FREQUENCIES_LENGTH 19
-float signalDetectionFrequencies[SIGNAL_DETECTION_FREQUENCIES_LENGTH] = { 300.00, 303.87, 304.25, 310.00, 315.00, 318.00, 390.00, 418.00, 433.07, 433.92, 434.42, 434.77, 438.90, 868.3, 868.35, 868.865, 868.95, 915.00, 925.00 };
+#define SIGNAL_DETECTION_FREQUENCIES_LENGTH 20
+float signalDetectionFrequencies[SIGNAL_DETECTION_FREQUENCIES_LENGTH] = { 300.00, 303.87, 304.25, 310.00, 315.00, 318.00, 390.00, 418.00, 433.07, 433.42, 433.92, 434.42, 434.77, 438.90, 868.3, 868.35, 868.865, 868.95, 915.00, 925.00 };
 int detectedRssi = -100;
 float detectedFrequency = 0.0;
 int fineRssi = -100;
@@ -53,33 +53,8 @@ float fineFrequency = 0.0;
 int minRssi = -75;
 bool RECORDING_SIGNAL = false;
 bool RxTxMode = true;
+int volltageUpdateTime = 500;
 
-
-// v2 freq analyzer
-static const uint32_t subghz_frequency_list[] = {
-  /* 300 - 348 */
-  300000000,
-  303875000,
-  304250000,
-  310000000,
-  315000000,
-  318000000,
-
-  /* 387 - 464 */
-  390000000,
-  418000000,
-  433075000,
-  433420000,
-  433920000,
-  434420000,
-  434775000,
-  438900000,
-
-  /* 779 - 928 */
-  868350000,
-  915000000,
-  925000000
-};
 
 typedef struct
 {
@@ -217,7 +192,7 @@ void setup() {
 
   // first start - ".as" to ".to"
   objectDoc = doc["sensorData"].as<JsonObject>();  // frequency, name, RawData[]
-  objectRC = docRC["data"].as<JsonObject>();         // frequency, name, data, bytes
+  objectRC = docRC["data"].as<JsonObject>();       // frequency, name, data, bytes
 }
 
 void loop() {
@@ -227,9 +202,15 @@ void loop() {
 void mainn() {
   bool displayUpdate = 1;
   tk();
+  int lastUpdateVolltage = millis()-500;
   while (1) {
     static uint8_t pointer = 0;
     tk();
+    if (millis()-lastUpdateVolltage>=volltageUpdateTime) {
+      oled.setCursor(100, 0);
+      oled.print(getVolltage() * 3.26 * 2.25 / 4096);  // volt * 3.26 * ((r1 + r2) / r2) / 4096
+      oled.update();
+    }
     if (displayUpdate != 0) {
       displayUpdate = 0;
       oled.clear();
@@ -238,13 +219,6 @@ void mainn() {
         oled.setCursor(14, i);
         oled.print(main_lay[i]);
       }
-      oled.setCursor(100, 0);
-      int volt = analogRead(35);
-      volt += analogRead(35);
-      volt += analogRead(35);
-      volt += analogRead(35);
-      volt /= 4;
-      oled.print(volt * 3.26 * 2.25 / 4096);  // volt * 3.26 * ((r1 + r2) / r2) / 4096
       printPointer(pointer);
       oled.update();
     }
@@ -277,6 +251,15 @@ void mainn() {
   }
 }
 
+
+float getVolltage() {
+  int volt = 0;
+  for (int i = 0; i < 100; i++) {
+    volt += analogRead(35);
+  }
+  volt /= 100;
+  return volt;
+}
 
 void rawLay() {
   bool updDisplay = true;
