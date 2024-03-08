@@ -53,7 +53,6 @@ float fineFrequency = 0.0;
 int minRssi = -75;
 bool RECORDING_SIGNAL = false;
 bool RxTxMode = true;
-int volltageUpdateTime = 500;
 
 
 typedef struct
@@ -202,15 +201,9 @@ void loop() {
 void mainn() {
   bool displayUpdate = 1;
   tk();
-  int lastUpdateVolltage = millis()-500;
   while (1) {
     static uint8_t pointer = 0;
     tk();
-    if (millis()-lastUpdateVolltage>=volltageUpdateTime) {
-      oled.setCursor(100, 0);
-      oled.print(getVolltage() * 3.26 * 2.25 / 4096);  // volt * 3.26 * ((r1 + r2) / r2) / 4096
-      oled.update();
-    }
     if (displayUpdate != 0) {
       displayUpdate = 0;
       oled.clear();
@@ -219,6 +212,8 @@ void mainn() {
         oled.setCursor(14, i);
         oled.print(main_lay[i]);
       }
+      oled.setCursor(100, 0);
+      oled.print(getVolltage() * 3.26 * 2.25 / 4096);  // volt * 3.26 * ((r1 + r2) / r2) / 4096
       printPointer(pointer);
       oled.update();
     }
@@ -254,10 +249,10 @@ void mainn() {
 
 float getVolltage() {
   int volt = 0;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 30; i++) {
     volt += analogRead(35);
   }
-  volt /= 100;
+  volt /= 30;
   return volt;
 }
 
