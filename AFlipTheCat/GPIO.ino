@@ -91,10 +91,35 @@ void changePin(uint8_t pointer1) {
       updOled = 1;
     }
     if (ok.click() or ok.hold()) {
-      switch (pointer1-1) {
-        case 0: pin1.change(); OutPinModeG[pointer1-1] = !OutPinModeG[pointer1-1]; break;
-        case 1: pin2.change(); OutPinModeG[pointer1-1] = !OutPinModeG[pointer1-1]; break;
-        case 2: pin3.change(); OutPinModeG[pointer1-1] = !OutPinModeG[pointer1-1]; break;
+      switch (pointer1 - 1) {
+        case 0:
+          switch (pointer - 1) {
+            case 0:
+              pin1.change();
+              if (pin1.getState()) {
+                pin1.start();
+              } else {
+                pin1.setFilling(0);
+              }
+              OutPinModeG[pointer1 - 1] = !OutPinModeG[pointer1 - 1];
+              break;
+            case 1:
+              pin1.setFrequency(setNumber("frequency", pin1.getFrequency()));
+              break;
+            case 2:
+              pin1.setFilling(setNumber("filling", pin1.getFilling()));
+              break;
+          }
+
+          break;
+        case 1:
+          pin2.change();
+          OutPinModeG[pointer1 - 1] = !OutPinModeG[pointer1 - 1];
+          break;
+        case 2:
+          pin3.change();
+          OutPinModeG[pointer1 - 1] = !OutPinModeG[pointer1 - 1];
+          break;
       }
 
       // pointer = constrain(pointer + 1, 1, ITEMS);
@@ -104,7 +129,8 @@ void changePin(uint8_t pointer1) {
 }
 
 void editPinParametr(uint8_t pin, uint8_t cursor) {
-  ;;
+  ;
+  ;
 }
 
 void printOutputPinsModeGPIO(int pointer) {

@@ -76,6 +76,7 @@ String setName(char* title) {
 }
 
 int countNumber(int cnt) {
+  if (cnt == 0) return 1;
   int n = 0;
   while (cnt > 0) {
     cnt /= 10;
@@ -89,12 +90,7 @@ int setNumber(char* title, int count) {
   tk();
   bool updOled = true;
   int outCnt = count;
-  int n = 0;
-  int cnt = count;
-  while (cnt > 0) {
-    cnt /= 10;
-    n++;
-  }
+  int n = countNumber(outCnt);
 
   while (1) {
     tk();
@@ -120,12 +116,18 @@ int setNumber(char* title, int count) {
     if (back.click()) {
       return count;
     }
-    if (up.click()) {
-      outCnt += pow(10, n - pointer - 1);
-      n = countNumber(outCnt);
-      updOled = true;
+    if (up.click() or up.step()) {
+      if (outCnt == 0) {
+        outCnt++;
+        n = countNumber(outCnt);
+        updOled = true;
+      } else {
+        outCnt += pow(10, n - pointer - 1);
+        n = countNumber(outCnt);
+        updOled = true;
+      }
     }
-    if (down.click()) {
+    if (down.click() or down.step()) {
       outCnt -= pow(10, n - pointer - 1);
       n = countNumber(outCnt);
       updOled = true;
