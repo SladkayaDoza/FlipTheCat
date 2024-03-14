@@ -93,10 +93,14 @@ public:
   void start() {
     ledcSetup(0, _frequency, 8);
     ledcAttachPin(_pin, 0);
+    ledcWrite(0, _filling);
   }
   void setFilling(int filling) {
     _filling = filling;
     ledcWrite(0, _filling);
+  }
+  void off() {
+    ledcWrite(0, 0);
   }
   bool getState() {
     return _flag;

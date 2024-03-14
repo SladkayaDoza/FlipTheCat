@@ -69,8 +69,8 @@ void changePin(uint8_t pointer1) {
         oled.print(GPIOPinsMode[i - 1]);
         switch (i - 1) {
           case 0: printOutputPinsModeGPIO(pointer1 - 1); break;
-          case 1: nothing(); break;
-          case 2: nothing(); break;
+          case 1: printOutputPinsFrequencyGPIO(); break;
+          case 2: printOutputPinsFillingGPIO(); break;
           case 3: nothing(); break;
           case 4: nothing(); break;
           case 5: nothing(); break;
@@ -99,7 +99,7 @@ void changePin(uint8_t pointer1) {
               if (pin1.getState()) {
                 pin1.start();
               } else {
-                pin1.setFilling(0);
+                pin1.off();
               }
               OutPinModeG[pointer1 - 1] = !OutPinModeG[pointer1 - 1];
               break;
@@ -140,6 +140,12 @@ void printOutputPinsModeGPIO(int pointer) {
     oled.print("HIGH");
   }
 }
+void printOutputPinsFillingGPIO() {
+  oled.print(pin1.getFilling());
+}
+void printOutputPinsFrequencyGPIO() {
+  oled.print(pin1.getFrequency());
+}
 
 void oledUpdater(uint8_t pointer) {
   tk();
@@ -166,8 +172,8 @@ void oledUpdater(uint8_t pointer) {
       oled.print(GPIOPinsMode[i - 1]);
       switch (i - 1) {
         case 0: printOutputPinsModeGPIO(pointer - 1); break;
-        case 1: nothing(); break;
-        case 2: nothing(); break;
+        case 1: printOutputPinsFrequencyGPIO(); break;
+        case 2: printOutputPinsFillingGPIO(); break;
         case 3: nothing(); break;
         case 4: nothing(); break;
         case 5: nothing(); break;
