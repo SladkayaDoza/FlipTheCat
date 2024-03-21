@@ -480,11 +480,11 @@ void detectSignal() {
       detectSignal();
       return;
     }
-    if (up.click()) {
+    if (up.click() or up.step()) {
       minRssi++;
       changed = true;
     }
-    if (down.click()) {
+    if (down.click() or down.step()) {
       minRssi--;
       changed = true;
     }
