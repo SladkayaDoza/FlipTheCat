@@ -725,6 +725,7 @@ void deleteRC(int pointer1) {
           break;
       }
     }
+    if(back.click()) return;
 
     if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 1, 2);
