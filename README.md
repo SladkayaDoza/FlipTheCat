@@ -4,6 +4,7 @@ Multitool for working with radio signals, based on FlipperZero on the basis of e
 ___
 I really want to write programs in flipper zero, but I don't have the money for it.  
 I would appreciate any support.
+Binance - alexmuhin1505@gmail.com or 727946949
 
 ## Functions
 - copying of an unlimited number of static signals (can be set in firmware)
