@@ -197,10 +197,10 @@ bool canMove(int board[boardSize][boardSize]) {
       if (board[i][j] == 0) {
         return true;  // Есть пустые ячейки, можно продолжить ходить
       }
-      if (i < boardSize - 1 && board[i][j] == board[i + 1][j]) {
+      if (i > 0 && board[i][j] == board[i  1][j]) {
         return true;  // Есть возможность объединения элементов по вертикали
       }
-      if (j < boardSize - 1 && board[i][j] == board[i][j + 1]) {
+      if (j > 0 && board[i][j] == board[i][j - 1]) {
         return true;  // Есть возможность объединения элементов по горизонтали
       }
     }
