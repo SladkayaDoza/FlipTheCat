@@ -36,6 +36,9 @@ You can suggest changes or additional features
 
 ## After assembling
 Once created, you need to calibrate the buttons and the resistive divider to output the battery voltage
+* To calibrate the buttons, uncomment line 11 in the "tick.ino" file
+* To calibrate the voltage you need to change the coefficients in the Function mainn()
+According to the formula - getVolltage() * 3.26 * ((r1 + r2) / r2) / 4096
 
 
 ##	Example of a finished product:
