@@ -8,5 +8,5 @@ void tk() {
   back.tick(analog < 1630 && analog > 1070);
   top_left.tick(!digitalRead(top_left_pin));
   top_right.tick(!digitalRead(top_right_pin));
-  // Serial.println(analog);  // 280
+  Serial.println(analog);  // 280
 }

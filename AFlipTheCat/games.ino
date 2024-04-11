@@ -197,7 +197,7 @@ bool canMove(int board[boardSize][boardSize]) {
       if (board[i][j] == 0) {
         return true;  // Есть пустые ячейки, можно продолжить ходить
       }
-      if (i > 0 && board[i][j] == board[i  1][j]) {
+      if (i > 0 && board[i][j] == board[i - 1][j]) {
         return true;  // Есть возможность объединения элементов по вертикали
       }
       if (j > 0 && board[i][j] == board[i][j - 1]) {
