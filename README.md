@@ -27,7 +27,7 @@ You can suggest changes or additional features
 - 10 smd buttons (2 for up gamepad buttons)
 - tp4057 type c charger with protection
 - step up dc-dc and linear voltage stabilizer | or step up, down corverter 3.3v
-- gpio output pins x18 (4+4+10)
+- gpio output pins x18 (4+10+4)
 - power switch
 - 7 resistors 10k(5 for buttons, 2 for boot pins esp32), 3 resistors 100k (1 for buttons, 2 for volltage censor), 1 resistor 600 Ohm (for led)
 - oled display 1.3"
