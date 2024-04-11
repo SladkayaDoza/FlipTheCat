@@ -1,12 +1,12 @@
 void tk() {
   int analog = analogRead(34);
-  up.tick(analog < 680 && analog > 120);
-  down.tick(analog < 2180 && analog > 1620);
-  left.tick(analog < 4096 && analog > 3760);
-  right.tick(analog < 1140 && analog > 580);
-  ok.tick(analog < 2920 && analog > 2360);
-  back.tick(analog < 1630 && analog > 1070);
+  up.tick(analog < 700 && analog > 120);
+  down.tick(analog < 2500 && analog > 1825);
+  left.tick(analog < 4096 && analog > 3480);
+  right.tick(analog < 1245 && analog > 700);
+  ok.tick(analog < 3480 && analog > 2500);
+  back.tick(analog < 1825 && analog > 1245);
   top_left.tick(!digitalRead(top_left_pin));
   top_right.tick(!digitalRead(top_right_pin));
-  Serial.println(analog);  // 280
+  // Serial.println(analog);  // 280
 }
