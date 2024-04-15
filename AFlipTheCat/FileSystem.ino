@@ -1,4 +1,4 @@
-void saveJsonToFile(char* filename, JsonDocument& docs) {
+void saveJsonToFile(const char* filename, JsonDocument& docs) {
   File file = SPIFFS.open(filename, "w");
   if (!file) {
     Serial.println("Не удалось открыть файл для записи");
@@ -14,7 +14,8 @@ void saveJsonToFile(char* filename, JsonDocument& docs) {
   Serial.print(buffer);
 }
 
-void readJsonFromFile(char* filename, JsonDocument& docs) {
+void readJsonFromFile(const char* filename, JsonDocument& docs) {
+  Serial.println(filename);
   File file = SPIFFS.open(filename, "r");
   if (!file) {
     Serial.println("Файл не найден, создаем новый");
@@ -26,7 +27,7 @@ void readJsonFromFile(char* filename, JsonDocument& docs) {
     Serial.println("Ошибка при чтении JSON из файла");
   } else {
     Serial.println("JSON успешно прочитан из файла");
-    // serializeJson(docs, Serial);
+    serializeJson(docs, Serial);
   }
 
   file.close();

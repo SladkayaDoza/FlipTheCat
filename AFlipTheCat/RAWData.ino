@@ -9,7 +9,7 @@ int recordedSamples = 0;
 long lastRecordDuration = 0;
 
 
-void RecordSignal(uint8_t pointer, JsonObject sens) {
+void RecordSignal(uint8_t pointer, JsonArray sensorArray, JsonObject sens) {
   String point = String(pointer);
 
   setupRx();
@@ -18,7 +18,7 @@ void RecordSignal(uint8_t pointer, JsonObject sens) {
   oled.print("Recording..");
   oled.update();
 
-  JsonArray sensorArray = sens[point]["RawData"].to<JsonArray>();
+  // JsonArray sensorArray = sens[point]["RawData"].to<JsonArray>();
 
   int i, transitions = 0;
   long lastRecordDuration = 0;
