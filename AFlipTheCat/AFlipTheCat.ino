@@ -319,9 +319,7 @@ void rawLay() {
         oled.update();
 
         JsonDocument rawSignal1;
-        JsonArray RawSignalArray = rawSignal1["RAW"].as<JsonArray>();
-        // JsonArray rawSignals = rawSignal1["RAW"].as<JsonArray>();
-        // readJsonFromFile("/raw1.json", rawSignal1);
+        // JsonArray RawSignalArray = rawSignal1["RAW"].as<JsonArray>();
         readJsonFromFile(objectDoc[j]["RawData"].as<const char*>(), rawSignal1); // Текст null
 
         // sendSamples(objectDoc[j]["RawData"].as<JsonArray>());
@@ -345,9 +343,8 @@ void rawLay() {
       JsonDocument rawSignal;
       JsonArray RawSignalArray = rawSignal["RAW"].to<JsonArray>();
       RecordSignal(pointer, RawSignalArray, objectDoc);
-      // doc[j]["RawData"] = "/raw"+j+".json";
+      objectDoc[j]["RawData"] = "/raw"+j+".json";
       saveJsonToFile("/raw.json", doc);
-      // saveJsonToFile("/raw1.json", rawSignal);
       saveJsonToFile(objectDoc[j]["RawData"].as<const char*>(), rawSignal);
 
       ELECHOUSE_cc1101.goSleep();
@@ -383,7 +380,7 @@ void rawMenu(uint8_t pointer1) {
       }
       oled.setCursor(14, 1);
       oled.print("size: ");
-      // oled.print(objectDoc[j]["RawData"].size());
+      oled.print(objectDoc[j]["size"].as<int>());
       oled.setCursor(14, 2);
       oled.print(" Rename");
       oled.setCursor(14, 3);

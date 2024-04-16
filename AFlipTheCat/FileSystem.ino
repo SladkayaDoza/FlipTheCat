@@ -9,13 +9,13 @@ void saveJsonToFile(const char* filename, JsonDocument& docs) {
   file.print(buffer);
   file.close();
   Serial.println("JSON успешно сохранен в файл");
-  serializeJson(docs, Serial);
+  // serializeJson(docs, Serial);
   Serial.println();
   Serial.print(buffer);
 }
 
 void readJsonFromFile(const char* filename, JsonDocument& docs) {
-  Serial.println(filename);
+  // Serial.println(filename);
   File file = SPIFFS.open(filename, "r");
   if (!file) {
     Serial.println("Файл не найден, создаем новый");
@@ -27,7 +27,7 @@ void readJsonFromFile(const char* filename, JsonDocument& docs) {
     Serial.println("Ошибка при чтении JSON из файла");
   } else {
     Serial.println("JSON успешно прочитан из файла");
-    serializeJson(docs, Serial);
+    // serializeJson(docs, Serial);
   }
 
   file.close();

@@ -36,6 +36,7 @@ void RecordSignal(uint8_t pointer, JsonArray sensorArray, JsonObject sens) {
   delay(1000);
 
   String name = setName("SetName");
+  sens[point]["size"] = transitions;
   sens[point]["name"] = name;
   sens[point]["frequency"] = FrequencyPointer;
 }
