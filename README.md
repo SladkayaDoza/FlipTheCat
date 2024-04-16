@@ -6,9 +6,6 @@ I really want to write programs in flipper zero, but I don't have the money for 
 I would appreciate any support.
 Binance - alexmuhin1505@gmail.com or 727946949
 
-## ToDo
-- https://trello.com/b/FfUWApZh/flip-esp32
-
 ## Functions
 - copying of an unlimited number of static signals (can be set in firmware)
 - change signal code, rename signal name, delete code
@@ -19,6 +16,9 @@ Binance - alexmuhin1505@gmail.com or 727946949
 - GPIO Frequency generator, set frequency and filling
 - Setting the broadcasting frequency and the start num of the 12-bit signal brute force
 - Game 2048
+
+## ToDo
+- https://trello.com/b/FfUWApZh/flip-esp32
 
 ## Open Project
 You can suggest changes or additional features
