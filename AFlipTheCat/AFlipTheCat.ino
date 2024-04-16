@@ -188,8 +188,6 @@ void setup() {
   drawLogo();
   oled.update();
 
-  // create_screen();
-
   for (int i = 0; i < pinsCount - 1; i++) {  // file GPIO.ino
     OutPinModeG[i] = 0;
   }
@@ -298,7 +296,7 @@ void rawLay() {
         int ui = i + ((pointer / 8) * 8);
         oled.setCursor(14, i);
         String j = String(ui);
-        if (objectDoc[j].isNull()) {
+        if (objectDoc[j].as<JsonObject>().isNull()) {
           oled.print("__");
         } else {
           oled.print(objectDoc[j]["name"].as<const char*>());
@@ -319,10 +317,7 @@ void rawLay() {
         oled.update();
 
         JsonDocument rawSignal1;
-        // JsonArray RawSignalArray = rawSignal1["RAW"].as<JsonArray>();
         readJsonFromFile(objectDoc[j]["RawData"].as<const char*>(), rawSignal1); // Текст null
-
-        // sendSamples(objectDoc[j]["RawData"].as<JsonArray>());
         sendSamples(rawSignal1["RAW"].as<JsonArray>());
         digitalWrite(led_pin, LOW);
         ELECHOUSE_cc1101.goSleep();
@@ -373,7 +368,7 @@ void rawMenu(uint8_t pointer1) {
       oled.home();
       oled.setCursor(14, 0);
       oled.print("OBJ: ");
-      if (objectDoc[j].isNull()) {
+      if (objectDoc[j].as<JsonObject>().isNull()) {
         oled.print("[EMPTY]");
       } else {
         oled.print(objectDoc[j]["name"].as<const char*>());
@@ -385,7 +380,6 @@ void rawMenu(uint8_t pointer1) {
       oled.print(" Rename");
       oled.setCursor(14, 3);
       oled.print(" Delete");
-      // oled.print(objectDoc[j]["RawData"].as<JsonArray>().size());
 
       printPointer(pointer);
       oled.update();
@@ -405,7 +399,11 @@ void rawMenu(uint8_t pointer1) {
           objectDoc[j]["name"] = setName("Raw");
           break;
         case 3:
+          if (SPIFFS.exists(objectDoc[j]["RawData"].as<const char*>())) {
+            SPIFFS.remove(objectDoc[j]["RawData"].as<const char*>());
+          }
           objectDoc.remove(j);
+          saveJsonToFile("/raw.json", doc);
           return;
           break;
       }
