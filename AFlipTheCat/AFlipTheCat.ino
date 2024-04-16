@@ -379,6 +379,8 @@ void rawMenu(uint8_t pointer1) {
       oled.setCursor(14, 2);
       oled.print(" Rename");
       oled.setCursor(14, 3);
+      oled.print(" Viewer");
+      oled.setCursor(14, 4);
       oled.print(" Delete");
 
       printPointer(pointer);
@@ -399,6 +401,9 @@ void rawMenu(uint8_t pointer1) {
           objectDoc[j]["name"] = setName("Raw");
           break;
         case 3:
+          viewer(j);
+          break;
+        case 4:
           if (SPIFFS.exists(objectDoc[j]["RawData"].as<const char*>())) {
             SPIFFS.remove(objectDoc[j]["RawData"].as<const char*>());
           }
