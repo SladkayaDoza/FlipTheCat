@@ -387,11 +387,11 @@ void rawMenu(uint8_t pointer1) {
       oled.update();
     }
     if (up.click() or up.step()) {
-      pointer = constrain(pointer - 1, 2, 3);
+      pointer = constrain(pointer - 1, 2, 4);
       updDisplay = 1;
     }
     if (down.click() or down.step()) {
-      pointer = constrain(pointer + 1, 2, 3);
+      pointer = constrain(pointer + 1, 2, 4);
       updDisplay = 1;
     }
     if (back.click() or back.hold()) break;
