@@ -51,21 +51,6 @@ void drawSignal(float cof, JsonArray arr, int size, int flyx, int centerX) {
   oled.print((int)(curx + (float)(arr[1].as<int>()) / cof));
   oled.print("  ");
   oled.print(size);
-  // for (int i = 0; i < size; i++) {
-  //   if (arr[i] > 0) {
-  //     bufx += arr[i].as<int>() / cof;
-  //     dot = 0;
-  //   } else {
-  //     bufx -= arr[i].as<int>() / cof;
-  //     dot = 1;
-  //   }
-    
-  //   if (bufx > centerX - 64 + flyx) {
-  //     oled.fastLineH(32 * dot + 16, curx, bufx - flyx);
-  //     curx = bufx - flyx;
-  //     oled.fastLineV(curx, 16, 48);
-  //   }
-  // }
 
   for (int i = 0; i < size; i++) {
     if (curx > 128) return;
