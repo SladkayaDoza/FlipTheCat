@@ -30,11 +30,11 @@ void viewer(String j) { // Ряжанка с яблоком, Злагода
 
     // Управление перемещением по X
     if (left.click() or left.step()) {
-      flyx = constrain(flyx - 10 / 10, 0, 99999);
+      flyx = constrain(flyx - 40 / 10, 0, 99999);
       displayUpdate = 1;
     }
     if (right.click() or right.step()) {
-      flyx = constrain(flyx + 10 / 10, 0, 99999);
+      flyx = constrain(flyx + 40 / 10, 0, 99999);
       displayUpdate = 1;
     }
 
