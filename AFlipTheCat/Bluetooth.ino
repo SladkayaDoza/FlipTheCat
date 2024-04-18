@@ -47,6 +47,7 @@ void selectKeyboard() {
   bool butLeft = false;
   bool butRight = false;
   bool init = true;
+  uint32_t lastSend = millis();
 
   bleKeyboard.begin();
 
@@ -60,27 +61,31 @@ void selectKeyboard() {
     tk();
     if (back.click() or back.hold()) break;
     if (bleKeyboard.isConnected()) {
-      if (init) {
-        init = 0;
-        bleKeyboard.releaseAll();
-      }
-      if (!digitalRead(top_left_pin) && butLeft == false) {
-        // Serial.println("left");
-        butLeft = true;
-        bleKeyboard.press(KEY_LEFT_ARROW);
-      }
-      if (digitalRead(top_left_pin) && butLeft) {
-        butLeft = false;
-        bleKeyboard.release(KEY_LEFT_ARROW);
-      }
+      if (millis() - lastSend > 10) {
+        if (init) {
+          init = 0;
+          bleKeyboard.releaseAll();
+        }
+        if (!digitalRead(top_left_pin) && butLeft == false) {
+          // Serial.println("left");
+          butLeft = true;
+          bleKeyboard.press(KEY_LEFT_ARROW);
+          lastSend = millis();
+        }
+        if (digitalRead(top_left_pin) && butLeft) {
+          butLeft = false;
+          bleKeyboard.release(KEY_LEFT_ARROW);
+        }
 
-      if (!digitalRead(top_right_pin) && butRight == false) {
-        butRight = true;
-        bleKeyboard.press(KEY_RIGHT_ARROW);
-      }
-      if (digitalRead(top_right_pin) && butRight) {
-        butRight = false;
-        bleKeyboard.release(KEY_RIGHT_ARROW);
+        if (!digitalRead(top_right_pin) && butRight == false) {
+          butRight = true;
+          bleKeyboard.press(KEY_RIGHT_ARROW);
+          lastSend = millis();
+        }
+        if (digitalRead(top_right_pin) && butRight) {
+          butRight = false;
+          bleKeyboard.release(KEY_RIGHT_ARROW);
+        }
       }
     }
   }

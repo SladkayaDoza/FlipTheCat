@@ -41,7 +41,7 @@ uint8_t FrequencyPointer = 10;
 int start12bitBruteForce = 1;
 
 uint8_t pinsCount = 4;         // numPins + 1 -- this value is pins + main Available pins
-const uint8_t pinsCounts = 3;  // numPins + 1 -- this value is pins + main Available pins
+const uint8_t pinsCounts = 3;
 int OutPinModeG[pinsCounts];
 
 // SINGAL DETECTION
