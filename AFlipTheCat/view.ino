@@ -44,7 +44,7 @@ void viewer(String j) { // Ряжанка с яблоком, Злагода
 }
 
 void drawSignal(float cof, JsonArray arr, int size, int flyx, int centerX) {
-  int curx = -flyx + centerX; // Вычисление координаты X с учетом смещения и центра экрана
+  int curx = -flyx + centerX;
   int bufx = 0;
   bool dot = 0;
   oled.setCursor(0, 0);
