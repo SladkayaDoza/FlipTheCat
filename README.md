@@ -42,6 +42,7 @@ Once created, you need to calibrate the buttons and the resistive divider to out
 * To calibrate the buttons, uncomment line 11 in the "tick.ino" file
 * To calibrate the voltage you need to change the coefficients in the Function mainn()
 According to the formula - getVolltage() * 3.26 * ((r1 + r2) / r2) / 4096
+When connecting to a computer via UART, do not connect 3.3v from the programmer, for correct display of values from the buttons
 
 
 ##	Example of a finished product:

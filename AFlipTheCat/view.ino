@@ -1,7 +1,6 @@
 void viewer(String j) { // Ряжанка с яблоком, Злагода
   bool displayUpdate = 1;
   float cof = 100; // Коэффициент масштабирования
-  int centerX = 64; // Координата X центра экрана
   float flyx = 1; // Смещение по X
   JsonDocument rawSignal1;
   readJsonFromFile(objectDoc[j]["RawData"].as<const char*>(), rawSignal1);
@@ -20,7 +19,7 @@ void viewer(String j) { // Ряжанка с яблоком, Злагода
       displayUpdate = 0;
       oled.clear();
       oled.home();
-      drawSignal(cof, rawSignal1["RAW"].as<JsonArray>(), size, flyx, centerX, allTime);  // Отрисовка сигнала
+      drawSignal(cof, rawSignal1["RAW"].as<JsonArray>(), size, flyx, allTime);  // Отрисовка сигнала
       oled.update();
     }
 
@@ -49,7 +48,7 @@ void viewer(String j) { // Ряжанка с яблоком, Злагода
   }
 }
 
-void drawSignal(float cof, JsonArray arr, int size, float flyx, int centerX, uint32_t allTime) {
+void drawSignal(float cof, JsonArray arr, int size, float flyx, uint32_t allTime) {
 
   uint32_t percent = allTime * (cof/100);  // Определение зоны для отображения
   uint32_t sdvig = (allTime - percent) * (flyx/100);  // Перемещение зоны в доступной области

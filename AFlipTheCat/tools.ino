@@ -65,11 +65,13 @@ String setName(char* title) {
       updOled = true;
     }
     if (left.click() or left.step()) {
-      pointerX = constrain(pointerX - 1, 0, 10);
+      if (pointerX == 0) pointerX = 10;
+      else pointerX = constrain(pointerX - 1, 0, 10);
       updOled = true;
     }
     if (right.click() or right.step()) {
-      pointerX = constrain(pointerX + 1, 0, 10);
+      if (pointerX == 10) pointerX = 0;
+      else pointerX = constrain(pointerX + 1, 0, 10);
       updOled = true;
     }
   }
