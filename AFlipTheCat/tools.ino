@@ -1,10 +1,13 @@
 // Keyboard
 char* symbols = "abcdefghijklmnopqrstuvwxyz!_,. <>";
+char* symbols1 = "1234567890*&^%$#@()-=+/|?~`:;\" <>";
+char* symbols3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!_,. <>";
 
 String setName(char* title) {
   static uint8_t pointerX = 0;
   static uint8_t pointerY = 0;
   String outValue = "";
+  bool disp = 0;
 
   bool updOled = true;
   tk();
@@ -22,7 +25,8 @@ String setName(char* title) {
         oled.setCursor(0, col * 2 + 2);
         byte stroke = 0;
         while (stroke <= 10) {
-          oled.print(symbols[col * 11 + stroke]);
+          if (!disp) oled.print(symbols[col * 11 + stroke]);
+          else oled.print(symbols1[col * 11 + stroke]);
           oled.print(" ");
           stroke++;
         }
@@ -46,7 +50,23 @@ String setName(char* title) {
         outValue = outValue.substring(0, outValue.length() - 1);
       }
       if (!systemCode) {
-        outValue += symbols[pointerY * 11 + pointerX];
+        if (!disp) outValue += symbols[pointerY * 11 + pointerX];
+        else outValue += symbols1[pointerY * 11 + pointerX];
+      }
+      updOled = true;
+    }
+    if (ok.hold()) {
+      bool systemCode = false;
+      if (pointerY == 2 && pointerX == 10) {
+        return outValue;
+      }
+      if (pointerY == 2 && pointerX == 9) {
+        systemCode = true;
+        outValue = outValue.substring(0, outValue.length() - 1);
+      }
+      if (!systemCode) {
+        if (!disp) outValue += symbols3[pointerY * 11 + pointerX];
+        else outValue += symbols1[pointerY * 11 + pointerX];
       }
       updOled = true;
     }
@@ -57,10 +77,12 @@ String setName(char* title) {
       return String("tmp - ") + random(100000, 999999);
     }
     if (up.click() or up.step()) {
+      if (pointerY == 0) disp = !disp;
       pointerY = constrain(pointerY - 1, 0, 2);
       updOled = true;
     }
     if (down.click() or down.step()) {
+      if (pointerY == 2) disp = !disp;
       pointerY = constrain(pointerY + 1, 0, 2);
       updOled = true;
     }
