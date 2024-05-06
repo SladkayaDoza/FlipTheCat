@@ -17,6 +17,14 @@ void settings() {
       oled.print("Start12bit: ");
       oled.print(start12bitBruteForce);
 
+      oled.setCursor(14, 2);
+      oled.print("Beep: ");
+      oled.print(pik);
+
+      oled.setCursor(14, 3);
+      oled.print("BeepHz: ");
+      oled.print(pikHz);
+
       if (editable) {
         printRightPointer(pointer);
       } else {
@@ -28,11 +36,20 @@ void settings() {
     if (ok.click()) {
       if (pointer == 1) {
         start12bitBruteForce = setNumber("12 bit", start12bitBruteForce);
-        updDisplay = true;
+      } else if (pointer == 2) {
+        pik = !pik;
+        objectConfigFile["pik"] = pik;
+        saveJsonToFile("/config.json", docConfigFile);
+      } else if (pointer == 3) {
+        pikHz = setNumber("picHz", pikHz);
+        objectConfigFile["pikHz"] = pikHz;
+        ledcWriteTone(1, pikHz);
+        ledcWrite(1, 0);
+        saveJsonToFile("/config.json", docConfigFile);
       } else {
         editable = !editable;
-        updDisplay = true;
       }
+      updDisplay = true;
     }
 
     if (back.click()) {

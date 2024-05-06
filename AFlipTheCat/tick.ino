@@ -8,5 +8,9 @@ void tk() {
   back.tick(analog < 1825 && analog > 1245);
   top_left.tick(!digitalRead(top_left_pin));
   top_right.tick(!digitalRead(top_right_pin));
+  if (pik && pikState && esp_timer_get_time() - TimePik > 10000) {
+    pikState = 0;
+    ledcWrite(1, 0);
+  }
   // Serial.println(analog);
 }

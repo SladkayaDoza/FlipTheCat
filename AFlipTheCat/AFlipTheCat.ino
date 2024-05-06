@@ -34,6 +34,10 @@ RCSwitch mySwitch = RCSwitch();
 unsigned long store1 = 0;
 uint8_t bitR1 = 0;
 uint8_t protoc = 0;
+bool pik = 0;
+uint64_t TimePik = esp_timer_get_time();
+bool pikState = 0;
+int pikHz = 2700;
 
 // float mainFrequency = 433.92;
 // SETTINGS
@@ -42,7 +46,7 @@ int start12bitBruteForce = 1;
 
 uint8_t pinsCount = 4;         // numPins + 1 -- this value is pins + main Available pins
 const uint8_t pinsCounts = 3;
-int OutPinModeG[pinsCounts];
+int OutPinModeG[pinsCounts] = {0};
 
 // SINGAL DETECTION
 #define SIGNAL_DETECTION_FREQUENCIES_LENGTH 20
@@ -69,8 +73,10 @@ const int rssi_threshold = -70;
 const int boardSize = 4;
 
 //  RAW DATA
+JsonDocument docConfigFile;
 JsonDocument doc;
 JsonDocument docRC;
+JsonObject objectConfigFile = docConfigFile["config"].add<JsonObject>();
 JsonObject objectDoc = doc["sensorData"].add<JsonObject>();
 JsonObject objectRC = docRC["data"].add<JsonObject>();
 
@@ -214,11 +220,18 @@ void setup() {
 
   readJsonFromFile("/raw.json", doc);
   readJsonFromFile("/rc.json", docRC);
+  readJsonFromFile("/config.json", docConfigFile);
   Serial.println("ready");
 
   // first start - ".as" to ".to"
   objectDoc = doc["sensorData"].as<JsonObject>();  // frequency, name, RawData[]
   objectRC = docRC["data"].as<JsonObject>();       // frequency, name, data, bytes
+  objectConfigFile = docConfigFile["config"].as<JsonObject>();       // frequency, name, data, bytes
+
+  // Buzzer
+  pik = objectConfigFile["pik"].as<bool>();
+  pikHz = objectConfigFile["pikHz"].as<int>();
+  setupBuzzer(pikHz);
 }
 
 void loop() {
@@ -248,10 +261,12 @@ void mainn() {
     // ||||| Кнопки |||||
     if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 0, ITEMS - 1);
+      beep();
       displayUpdate = 1;
     }
     if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 0, ITEMS - 1);
+      beep();
       displayUpdate = 1;
     }
     if (ok.click() or ok.hold()) {
