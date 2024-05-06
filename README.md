@@ -32,10 +32,12 @@ You can suggest changes or additional features
 - step up dc-dc and linear voltage stabilizer | or step up, down corverter 3.3v
 - gpio output pins x18 (4+10+4)
 - power switch
-- 7 resistors 10k(5 for buttons, 2 for boot pins esp32), 3 resistors 100k (1 for buttons, 2 for volltage censor), 1 resistor 600 Ohm (for led)
+- 8 resistors 10k(5 for buttons, 2 for boot pins esp32, 1 for buzzer transistor), 3 resistors 100k (1 for buttons, 2 for volltage censor), 1 resistor 600 Ohm (for led)
 - oled display 1.3"
 - yellow led for indicator
 - 2 capacitor (10v 220uf, 10v, 220pf)
+- Buzzer 3.3v
+- Transistor for buzzer
 
 ## After assembling
 Once created, you need to calibrate the buttons and the resistive divider to output the battery voltage
