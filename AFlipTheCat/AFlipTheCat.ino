@@ -11,7 +11,6 @@
 GyverOLED<SSH1106_128x64> oled;
 
 #include <Wire.h>
-
 #include <EncButton.h>
 
 VirtButton up;
