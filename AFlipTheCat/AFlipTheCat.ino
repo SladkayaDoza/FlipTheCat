@@ -38,7 +38,6 @@ uint64_t TimePik = esp_timer_get_time();
 bool pikState = 0;
 int pikHz = 2700;
 
-// float mainFrequency = 433.92;
 // SETTINGS
 uint8_t FrequencyPointer = 10;
 int start12bitBruteForce = 1;
