@@ -229,7 +229,8 @@ void setup() {
   // Buzzer
   pik = objectConfigFile["pik"].as<bool>();
   pikHz = objectConfigFile["pikHz"].as<int>();
-  setupBuzzer(pikHz);
+
+  if (pik) setupBuzzer(pikHz);
 }
 
 void loop() {
