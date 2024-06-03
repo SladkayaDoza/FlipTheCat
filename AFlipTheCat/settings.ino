@@ -38,6 +38,7 @@ void settings() {
         start12bitBruteForce = setNumber("12 bit", start12bitBruteForce);
       } else if (pointer == 2) {
         pik = !pik;
+        if (pik) setupBuzzer(pikHz);
         objectConfigFile["pik"] = pik;
         saveJsonToFile("/config.json", docConfigFile);
       } else if (pointer == 3) {
