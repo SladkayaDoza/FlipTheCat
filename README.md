@@ -47,6 +47,7 @@ According to the formula - getVolltage() * 3.26 * ((r1 + r2) / r2) / 4096
 When connecting to a computer via UART, do not connect 3.3v from the programmer, for correct display of values from the buttons
 
 
+
 ##	Example of a finished product:
 <img src="https://github.com/SladkayaDoza/FlipTheCat/blob/index.html/images/IMG_20240229_224614_977.jpg" width="500">
 <img src="https://github.com/SladkayaDoza/FlipTheCat/blob/index.html/images/IMG_20240229_224615_312.jpg" width="500">
