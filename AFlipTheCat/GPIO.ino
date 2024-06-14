@@ -172,8 +172,8 @@ void oledUpdater(uint8_t pointer) {
       oled.print(GPIOPinsMode[i - 1]);
       switch (i - 1) {
         case 0: printOutputPinsModeGPIO(pointer - 1); break;
-        case 1: printOutputPinsFrequencyGPIO(); break;
-        case 2: printOutputPinsFillingGPIO(); break;
+        case 1: if (pinSelect == 0) printOutputPinsFrequencyGPIO(); break;
+        case 2: if (pinSelect == 0) printOutputPinsFillingGPIO(); break;
         case 3: nothing(); break;
         case 4: nothing(); break;
         case 5: nothing(); break;
