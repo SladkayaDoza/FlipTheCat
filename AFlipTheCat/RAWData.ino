@@ -27,7 +27,7 @@ void RecordSignal(uint8_t pointer, JsonArray sensorArray, JsonObject sens) {
     tk();
     if(back.click() or back.hold()) return;
   }
-  
+
   if (beep) beep();
 
   oled.clear();
@@ -35,7 +35,10 @@ void RecordSignal(uint8_t pointer, JsonArray sensorArray, JsonObject sens) {
   oled.print(transitions);
   oled.println(" Transitions Recorded");
   oled.update();
-  delay(1000);
+  uint16_t tmmm = millis();
+  while(millis() - tmmm < 1000) {
+    tk();
+  }
 
   String name = setName("SetName");
   sens[point]["size"] = transitions;

@@ -52,8 +52,9 @@ void settings() {
         ledcWrite(1, 0);
         saveJsonToFile("/config.json", docConfigFile);
         break;
+      default:
+        editable = !editable;
       }
-      editable = !editable;
     }
 
     if (back.click()) {

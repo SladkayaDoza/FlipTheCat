@@ -260,12 +260,10 @@ void mainn() {
     // ||||| Кнопки |||||
     if (up.click() or up.step()) {
       pointer = constrain(pointer - 1, 0, ITEMS - 1);
-      beep();
       displayUpdate = 1;
     }
     if (down.click() or down.step()) {
       pointer = constrain(pointer + 1, 0, ITEMS - 1);
-      beep();
       displayUpdate = 1;
     }
     if (ok.click() or ok.hold()) {
