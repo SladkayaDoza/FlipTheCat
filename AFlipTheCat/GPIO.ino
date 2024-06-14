@@ -9,9 +9,6 @@ byte updOled = 0;
 //     uint8_t filling[pinsCounts];
 // }
 
-
-
-
 char* GPIOPinsMode[7] = {
   "mode: ",
   "frequency: ",
