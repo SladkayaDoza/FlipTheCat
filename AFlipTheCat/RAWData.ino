@@ -27,6 +27,8 @@ void RecordSignal(uint8_t pointer, JsonArray sensorArray, JsonObject sens) {
     tk();
     if(back.click() or back.hold()) return;
   }
+  
+  if (beep) beep();
 
   oled.clear();
   oled.home();
@@ -39,6 +41,7 @@ void RecordSignal(uint8_t pointer, JsonArray sensorArray, JsonObject sens) {
   sens[point]["size"] = transitions;
   sens[point]["name"] = name;
   sens[point]["frequency"] = FrequencyPointer;
+  
 }
 // передать json лист
 

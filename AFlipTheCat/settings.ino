@@ -34,23 +34,26 @@ void settings() {
     }
 
     if (ok.click()) {
-      if (pointer == 1) {
+      updDisplay = true;
+      switch (pointer) {
+      case 1:
         start12bitBruteForce = setNumber("12 bit", start12bitBruteForce);
-      } else if (pointer == 2) {
+        break;
+      case 2:
         pik = !pik;
         if (pik) setupBuzzer(pikHz);
         objectConfigFile["pik"] = pik;
         saveJsonToFile("/config.json", docConfigFile);
-      } else if (pointer == 3) {
+        break;
+      case 3:
         pikHz = setNumber("picHz", pikHz);
         objectConfigFile["pikHz"] = pikHz;
         ledcWriteTone(1, pikHz);
         ledcWrite(1, 0);
         saveJsonToFile("/config.json", docConfigFile);
-      } else {
-        editable = !editable;
+        break;
       }
-      updDisplay = true;
+      editable = !editable;
     }
 
     if (back.click()) {
@@ -58,25 +61,30 @@ void settings() {
     }
 
     if (editable) {
-      if (up.click()) {
-        if (pointer == 0) {
+      if (up.click() or up.step()) {
+        switch (pointer) {
+        case 0:
           FrequencyPointer = constrain(FrequencyPointer + 1, 0, SIGNAL_DETECTION_FREQUENCIES_LENGTH - 1);
           updDisplay = true;
+          break;
         }
       }
-      if (down.click()) {
-        if (pointer == 0) {
+
+      if (down.click() or down.step()) {
+        switch (pointer) {
+        case 0:
           FrequencyPointer = constrain(FrequencyPointer - 1, 0, SIGNAL_DETECTION_FREQUENCIES_LENGTH - 1);
           updDisplay = true;
+          break;
         }
       }
 
     } else {
-      if (up.click() or up.hold()) {
+      if (up.click() or up.step()) {
         pointer = constrain(pointer - 1, 0, ITEMS - 1);
         updDisplay = true;
       }
-      if (down.click() or down.hold()) {
+      if (down.click() or down.step()) {
         pointer = constrain(pointer + 1, 0, ITEMS - 1);
         updDisplay = true;
       }
