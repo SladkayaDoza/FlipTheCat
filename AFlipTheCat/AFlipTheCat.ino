@@ -57,7 +57,6 @@ int minRssi = -75;
 bool RECORDING_SIGNAL = false;
 bool RxTxMode = true;
 
-
 typedef struct
 {
   uint32_t frequency_coarse;
@@ -68,7 +67,6 @@ typedef struct
 const int rssi_threshold = -70;
 
 
-const int boardSize = 4;
 
 //  RAW DATA
 JsonDocument docConfigFile;
