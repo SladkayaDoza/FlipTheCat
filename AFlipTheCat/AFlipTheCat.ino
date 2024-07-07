@@ -1,5 +1,6 @@
 #include "NimBLEDevice.h"
 #include <BleKeyboard.h>
+
 // #include <BleMouse.h>
 // #define USE_NIMBLE
 
@@ -194,6 +195,8 @@ void setup() {
     OutPinModeG[i] = 0;
   }
 
+  setup_adc();
+
   ELECHOUSE_cc1101.Init();
   ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
   // ELECHOUSE_cc1101.setRxBW(58);
@@ -281,16 +284,6 @@ void mainn() {
       displayUpdate = 1;
     }
   }
-}
-
-
-float getVolltage() {
-  int volt = 0;
-  for (int i = 0; i < 30; i++) {
-    volt += analogRead(35);
-  }
-  volt /= 30;
-  return volt;
 }
 
 void rawLay() {
