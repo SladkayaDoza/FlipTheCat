@@ -13,6 +13,7 @@ void RecordSignal(uint8_t pointer, JsonArray sensorArray, JsonObject sens) {
   String point = String(pointer);
 
   setupRx();
+  ELECHOUSE_cc1101.setRxBW(RxBW_Raw);
   oled.clear();
   oled.home();
   oled.print("Recording..");

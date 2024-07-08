@@ -166,3 +166,12 @@ int setNumber(char* title, int count) {
     }
   }
 }
+
+void addElementToFront(uint16_t* arr, int size, uint16_t newElement) {
+  // Сдвигаем элементы массива вправо
+  for (int i = size - 1; i > 0; i--) {
+    arr[i] = arr[i - 1];
+  }
+  // Добавляем новый элемент в начало
+  arr[0] = newElement;
+}

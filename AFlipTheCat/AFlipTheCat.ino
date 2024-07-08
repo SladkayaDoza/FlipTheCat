@@ -38,6 +38,7 @@ bool pik = 0;
 uint64_t TimePik = esp_timer_get_time();
 bool pikState = 0;
 int pikHz = 2700;
+float RxBW_Raw = 256;
 
 // SETTINGS
 uint8_t FrequencyPointer = 10;
@@ -183,7 +184,7 @@ void setup() {
   // } else {
   //   Serial.println("Файл не существует");
   // }
-  Wire.setClock(800000L);
+  Wire.setClock(400000L);
 
   oled.init();
   oled.clear();
@@ -194,8 +195,6 @@ void setup() {
   for (int i = 0; i < pinsCount - 1; i++) {  // file GPIO.ino
     OutPinModeG[i] = 0;
   }
-
-  setup_adc();
 
   ELECHOUSE_cc1101.Init();
   ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
@@ -244,7 +243,7 @@ void mainn() {
   while (1) {
     static uint8_t pointer = 0;
     tk();
-    if (displayUpdate != 0) {
+    if (displayUpdate) {
       displayUpdate = 0;
       oled.clear();
       oled.home();
@@ -253,7 +252,7 @@ void mainn() {
         oled.print(main_lay[i]);
       }
       oled.setCursor(100, 0);
-      oled.print(getVolltage() * 3.26 * 2.25 / 4096);  // volt * 3.26 * ((r1 + r2) / r2) / 4096
+      oled.print(getVolltage());  // volt * 3.26 * ((r1 + r2) / r2) / 4096
       printPointer(pointer);
       oled.update();
     }
@@ -352,6 +351,10 @@ void rawLay() {
     if (back.click() or back.hold()) break;
     if (left.hold()) {
       rawMenu(pointer);
+      updDisplay = 1;
+    }
+    if(top_left.click() or top_left.hold()) {
+      settingsRawBW();
       updDisplay = 1;
     }
   }

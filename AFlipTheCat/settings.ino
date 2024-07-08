@@ -1,3 +1,5 @@
+#define DEAD_TIME_IIC 160
+
 void settings() {
   bool updDisplay = true;
   bool editable = false;
@@ -89,6 +91,123 @@ void settings() {
         pointer = constrain(pointer + 1, 0, ITEMS - 1);
         updDisplay = true;
       }
+    }
+  }
+}
+
+SemaphoreHandle_t displayMutex;
+
+struct TaskParameters {
+  bool *updDisplay;
+  uint16_t *tiles;
+};
+
+void whileReadChanges(void *pvParameters) {
+  TaskParameters *params = (TaskParameters *)pvParameters;
+  bool *updDisplay = params->updDisplay;
+  uint16_t *tiles = params->tiles;
+
+  while (1) {
+    if (xSemaphoreTake(displayMutex, portMAX_DELAY)) {
+      if (*updDisplay) {
+        *updDisplay = false;
+        
+        oled.clear();
+        oled.home();
+
+        oled.setCursor(14, 0);
+        oled.print("RxBW: ");
+        oled.print(RxBW_Raw);
+
+        for (int i = 0; i < 16; i++) {
+          oled.rect(i*8+1, 64, i*8+7, 62-tiles[15-i]);
+        }
+        
+        oled.update();
+      }
+      xSemaphoreGive(displayMutex);
+    }
+    vTaskDelay(1 / portTICK_PERIOD_MS);  // Небольшая задержка для стабилизации работы
+  }
+}
+
+void settingsRawBW() {
+  setupRx();
+  float tempRxBW = RxBW_Raw;
+  digitalRead(RCPin);
+  bool updDisplay = true;
+  uint32_t last_time = millis();
+  int count = 0;
+  uint16_t tiles[16] = {0};
+  bool last_state = 0;
+
+  TaskHandle_t reader = NULL;
+  TaskParameters params = {&updDisplay, tiles};
+  displayMutex = xSemaphoreCreateMutex();
+
+  // Создание задачи на Core 1
+  xTaskCreatePinnedToCore(
+    whileReadChanges,      // Функция задачи
+    "Reader",    // Название задачи
+    10000,            // Размер стека для задачи
+    (void *)&params,             // Параметры задачи
+    1,                // Приоритет задачи
+    &reader,             // Указатель на созданную задачу (не используется)
+    1                 // Номер ядра (0 для Core 0, 1 для Core 1)
+  );
+
+  while (1) {
+    tk();
+
+    if (digitalRead(RCPin) != last_state && millis() - last_time > DEAD_TIME_IIC) {
+      last_state = !last_state;
+      count++;
+    }
+
+    if (millis() - last_time > 1000) {
+      addElementToFront(tiles, 16, count);
+      count = 0;
+      updDisplay = 1;
+      last_time = millis();
+    }
+
+    if (up.click() or up.step()) {
+      RxBW_Raw += 10;
+      ELECHOUSE_cc1101.setRxBW(RxBW_Raw);
+      updDisplay = 1;
+    }
+    if (right.click() or right.step()) {
+      RxBW_Raw += 1;
+      ELECHOUSE_cc1101.setRxBW(RxBW_Raw);
+      updDisplay = 1;
+    }
+    if (down.click() or down.step()) {
+      RxBW_Raw -= 10;
+      ELECHOUSE_cc1101.setRxBW(RxBW_Raw);
+      updDisplay = 1;
+    }
+    if (left.click() or left.step()) {
+      RxBW_Raw -= 1;
+      ELECHOUSE_cc1101.setRxBW(RxBW_Raw);
+      updDisplay = 1;
+    }
+
+    if (back.click() or back.hold()) {
+      RxBW_Raw = tempRxBW;
+      ELECHOUSE_cc1101.setRxBW(RxBW_Raw);
+      if (reader != NULL) {
+        vTaskDelete(reader);  // Удаляем задачу
+        reader = NULL;
+      }
+      return;
+    }
+
+    if (ok.click() or ok.hold()) {
+      if (reader != NULL) {
+        vTaskDelete(reader);  // Удаляем задачу
+        reader = NULL;
+      }
+      return;
     }
   }
 }
