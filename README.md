@@ -4,7 +4,7 @@ Multitool for working with radio signals, based on FlipperZero on the basis of e
 ___
 I really want to write programs in flipper zero, but I don't have the money for it.  
 I would appreciate any support.
-Binance - 727946949
+Metamask - 0x55aB63c8359f82a16f5B1eb500CaBc8DB605ACE0
 
 ## Functions
 - copying of an unlimited number of static signals (can be set in firmware)
