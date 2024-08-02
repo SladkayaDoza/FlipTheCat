@@ -59,14 +59,14 @@ int minRssi = -75;
 bool RECORDING_SIGNAL = false;
 bool RxTxMode = true;
 
-typedef struct
-{
-  uint32_t frequency_coarse;
-  int rssi_coarse;
-  uint32_t frequency_fine;
-  int rssi_fine;
-} FrequencyRSSI;
-const int rssi_threshold = -70;
+// typedef struct
+// {
+//   uint32_t frequency_coarse;
+//   int rssi_coarse;
+//   uint32_t frequency_fine;
+//   int rssi_fine;
+// } FrequencyRSSI;
+// const int rssi_threshold = -70;
 
 
 
@@ -155,7 +155,7 @@ char* blue_lay[8] = {
 void setupRx() {
   ELECHOUSE_cc1101.Init();
   // ELECHOUSE_cc1101.setRxBW(812.50);
-  ELECHOUSE_cc1101.setRxBW(256);
+  // ELECHOUSE_cc1101.setRxBW(256);
   ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
   // if (!RxTxMode) {
   pinMode(RCPin, INPUT);
@@ -184,7 +184,7 @@ void setup() {
   // } else {
   //   Serial.println("Файл не существует");
   // }
-  Wire.setClock(400000L);
+  Wire.setClock(800000L);
 
   oled.init();
   oled.clear();
@@ -196,13 +196,6 @@ void setup() {
     OutPinModeG[i] = 0;
   }
 
-  ELECHOUSE_cc1101.Init();
-  ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
-  // ELECHOUSE_cc1101.setRxBW(58);
-  mySwitch.enableReceive(RCPin);
-  // mySwitch.setPulseLength();
-  ELECHOUSE_cc1101.SetRx();
-  ELECHOUSE_cc1101.goSleep();
 
   pinMode(top_left_pin, INPUT_PULLUP);
   pinMode(top_right_pin, INPUT_PULLUP);
@@ -231,6 +224,16 @@ void setup() {
   pikHz = objectConfigFile["pikHz"].as<int>();
 
   if (pik) setupBuzzer(pikHz);
+  
+  ELECHOUSE_cc1101.setSpiPin(18, 19, 23, (objectConfigFile["externalССModule"].as<bool>() ? 13 : 5));
+  ELECHOUSE_cc1101.Init();
+  ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
+  // ELECHOUSE_cc1101.setRxBW(58);
+  mySwitch.enableReceive(RCPin);
+  ELECHOUSE_cc1101.setGDO0(RCPin);
+  // mySwitch.setPulseLength();
+  ELECHOUSE_cc1101.SetRx();
+  ELECHOUSE_cc1101.goSleep();
 }
 
 void loop() {
@@ -469,6 +472,10 @@ void rcLay() {
       displayUpdate = 1;
     }
     if (right.click() or right.hold()) {
+      String j = String(pointer);
+      if (!objectRC[j].isNull()) {
+        if (!confirmReWrite()) return;
+      }
       func_reciv(pointer);
       ELECHOUSE_cc1101.goSleep();
       displayUpdate = 1;
@@ -479,7 +486,7 @@ void rcLay() {
 
 void detectSignal() {
   setupRx();
-  ELECHOUSE_cc1101.setRxBW(64);
+  // ELECHOUSE_cc1101.setRxBW(64);
   byte signalDetected = 0;
   bool changed = false;
   detectedRssi = -100;

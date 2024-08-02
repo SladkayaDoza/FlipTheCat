@@ -26,6 +26,10 @@ void settings() {
       oled.setCursor(14, 3);
       oled.print("BeepHz: ");
       oled.print(pikHz);
+      
+      oled.setCursor(14, 4);
+      oled.print("CC module: ");
+      oled.print(objectConfigFile["externalССModule"].as<bool>() ? "External" : "Internal");
 
       if (editable) {
         printRightPointer(pointer);
@@ -52,6 +56,16 @@ void settings() {
         objectConfigFile["pikHz"] = pikHz;
         ledcWriteTone(1, pikHz);
         ledcWrite(1, 0);
+        saveJsonToFile("/config.json", docConfigFile);
+        break;
+      case 4:
+        objectConfigFile["externalССModule"] = !objectConfigFile["externalССModule"].as<bool>();
+        ELECHOUSE_cc1101.setSpiPin(18, 19, 23, (objectConfigFile["externalССModule"].as<bool>() ? 13 : 5));
+        ELECHOUSE_cc1101.Init();
+        ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
+        mySwitch.enableReceive(RCPin);
+        ELECHOUSE_cc1101.SetRx();
+        ELECHOUSE_cc1101.goSleep();
         saveJsonToFile("/config.json", docConfigFile);
         break;
       default:
@@ -199,6 +213,7 @@ void settingsRawBW() {
         vTaskDelete(reader);  // Удаляем задачу
         reader = NULL;
       }
+      ELECHOUSE_cc1101.goSleep();
       return;
     }
 
@@ -207,6 +222,7 @@ void settingsRawBW() {
         vTaskDelete(reader);  // Удаляем задачу
         reader = NULL;
       }
+      ELECHOUSE_cc1101.goSleep();
       return;
     }
   }

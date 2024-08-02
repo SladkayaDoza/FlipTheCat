@@ -167,6 +167,48 @@ int setNumber(char* title, int count) {
   }
 }
 
+bool confirmReWrite() {
+  bool updOled = 1;
+  static uint8_t pointer = 1;
+  while (1) {
+    tk();
+    if (updOled) {
+      updOled = 0;
+      oled.clear();
+      oled.setCursor(0, 0);
+      oled.print("re-record?");
+      oled.print(": ");
+      
+      oled.setCursor(14, 1);
+      oled.print("Yes");
+      oled.setCursor(14, 2);
+      oled.print("Back");
+
+      printPointer(pointer);
+      oled.update();
+    }
+    if(back.click() or back.hold()) {
+      return true;
+    }
+
+    if (up.click() or up.step()) {
+      pointer = constrain(pointer - 1, 1, 2);
+      updOled = 1;
+    }
+    if (down.click() or down.step()) {
+      pointer = constrain(pointer + 1, 1, 2);
+      updOled = 1;
+    }
+    if (ok.click() or ok.hold()) {
+      if (pointer == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+}
+
 void addElementToFront(uint16_t* arr, int size, uint16_t newElement) {
   // Сдвигаем элементы массива вправо
   for (int i = size - 1; i > 0; i--) {
