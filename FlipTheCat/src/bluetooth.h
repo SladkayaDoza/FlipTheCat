@@ -1,0 +1,2 @@
+void selectMouse();
+void selectKeyboard();
