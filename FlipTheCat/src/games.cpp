@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "game2048.h"
+#include "gamecat.h"
 #include <pointer.h>
 #include <tick.h>
 #include <global_vars.h>
@@ -7,10 +8,11 @@
 
 // GAMES
 Game2048 game;
+GameCat gameCat;
 
 const char* game_lay[8] = {
   "2048",
-  "",
+  "Cat",
   "",
   "",
   "",
@@ -51,6 +53,7 @@ void games() {
     if (ok.click() or ok.hold()) {
       switch (pointer) {
         case 0: game.init(); game.run(); break;
+        case 1: gameCat.init(); gameCat.run(); break;
       }
       updDisplay = 1;
     }
