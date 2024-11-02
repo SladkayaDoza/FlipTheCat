@@ -126,9 +126,9 @@ void GameCat::run() {
 
 void GameCat::moveLeft() {
   int newUserX = constrain(userX - 1, 0, 15);
-  if (board[userY][newUserX] != 1) {  // Check if the new position is not a wall
+  if (board[newUserX][userY] != 1) {  // Check if the new position is not a wall
     if (newUserX == boxX && userY == boxY) {
-      if (boxX > 0 && board[boxY][boxX - 1] != 1) {  // Check if the box can be moved and not into a wall
+      if (boxX > 0 && board[boxX - 1][boxY] != 1) {  // Check if the box can be moved and not into a wall
         boxX -= 1;
         userX = newUserX;
       }
@@ -140,9 +140,9 @@ void GameCat::moveLeft() {
 
 void GameCat::moveRight() {
   int newUserX = constrain(userX + 1, 0, 15);
-  if (board[userY][newUserX] != 1) {  // Check if the new position is not a wall
+  if (board[newUserX][userY] != 1) {  // Check if the new position is not a wall
     if (newUserX == boxX && userY == boxY) {
-      if (boxX < 15 && board[boxY][boxX + 1] != 1) {  // Check if the box can be moved and not into a wall
+      if (boxX < 15 && board[boxX + 1][boxY] != 1) {  // Check if the box can be moved and not into a wall
         boxX += 1;
         userX = newUserX;
       }
@@ -154,9 +154,9 @@ void GameCat::moveRight() {
 
 void GameCat::moveUp() {
   int newUserY = constrain(userY - 1, 0, 7);
-  if (board[newUserY][userX] != 1) {  // Check if the new position is not a wall
+  if (board[userX][newUserY] != 1) {  // Check if the new position is not a wall
     if (newUserY == boxY && userX == boxX) {
-      if (boxY > 0 && board[boxY - 1][boxX] != 1) {  // Check if the box can be moved and not into a wall
+      if (boxY > 0 && board[boxX][boxY - 1] != 1) {  // Check if the box can be moved and not into a wall
         boxY -= 1;
         userY = newUserY;
       }
@@ -168,9 +168,9 @@ void GameCat::moveUp() {
 
 void GameCat::moveDown() {
   int newUserY = constrain(userY + 1, 0, 7);
-  if (board[newUserY][userX] != 1) {  // Check if the new position is not a wall
+  if (board[userX][newUserY] != 1) {  // Check if the new position is not a wall
     if (newUserY == boxY && userX == boxX) {
-      if (boxY < 7 && board[boxY + 1][boxX] != 1) {  // Check if the box can be moved and not into a wall
+      if (boxY < 7 && board[boxX][boxY + 1] != 1) {  // Check if the box can be moved and not into a wall
         boxY += 1;
         userY = newUserY;
       }
@@ -183,9 +183,9 @@ void GameCat::moveDown() {
 void GameCat::printBoard() {
   oled.drawBitmap(userX*8, userY*8, pix_cat_8x8, 8, 8);
   oled.drawBitmap(boxX*8, boxY*8, pix_box_8x8, 8, 8);
-  for (int y = 0; y < 8; y++) {
-    for (int x = 0; x < 16; x++) {
-      if (board[y][x] == 1) {
+  for (int x = 0; x < 16; x++) {
+    for (int y = 0; y < 8; y++) {
+      if (board[x][y] == 1) {
         oled.drawBitmap(x*8, y*8, pix_wall_8x8, 8, 8);
       }
     }
