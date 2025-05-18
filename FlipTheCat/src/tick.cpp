@@ -15,5 +15,5 @@ void tk() {
     pikState = 0;
     ledcWrite(1, 0);
   }
-  // Serial.println(analog);
+  Serial.println(analog);
 }

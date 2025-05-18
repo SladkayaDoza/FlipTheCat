@@ -6,7 +6,7 @@ void saveJsonToFile(const char* filename, JsonDocument& docs) {
   File file = SPIFFS.open(filename, "w");
   if (!file) {
     Serial.println("Не удалось открыть файл для записи");
-    // return;
+    return;
   }
   String buffer;
   serializeJson(docs, buffer);

@@ -8,7 +8,7 @@ const float referenceVoltage = 3.348;  // Референсное напряже�
 const int adcResolution = 4095;  // Разрешение АЦП (12 бит)
 
 float getVolltage() {
-  int adcValue = 0;
+  float adcValue = 0;
   for (int i = 0; i < 64; i++) {
     adcValue += analogRead(35);  // 2.339v or 2902
   }
