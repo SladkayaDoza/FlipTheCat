@@ -47,6 +47,9 @@ RCSwitch mySwitch = RCSwitch();
 #include <games.h>
 #include <radio.h>
 #include <bluetooth.h>
+#include <wifi_app.h>
+#include <temp.h>
+#include <menu.h>
 
 
 
@@ -67,9 +70,9 @@ RCSwitch mySwitch = RCSwitch();
 JsonDocument docConfigFile;
 JsonDocument doc;
 JsonDocument docRC;
-JsonObject objectConfigFile = docConfigFile["config"].add<JsonObject>();
-JsonObject objectDoc = doc["sensorData"].add<JsonObject>();
-JsonObject objectRC = docRC["data"].add<JsonObject>();
+JsonObject objectConfigFile = docConfigFile["config"].to<JsonObject>();
+JsonObject objectDoc = doc["sensorData"].to<JsonObject>();
+JsonObject objectRC = docRC["data"].to<JsonObject>();
 
 
 
@@ -89,27 +92,32 @@ void deleteRC(int pointer1);
 void select_deleteRc(uint8_t pointer);
 
 
-const char* main_lay[8] = {
-  "RC Custom",
-  "RawData Read",
-  "Frequency Analyzer",
-  "RC 12bit bruteForce",
-  "BLUETOOTH",
-  "GPIO",
-  "Settings",
-  "Games",
-};
+// Обёртка: rc12bitBruteForce не усыпляет радио сам — делаем это после (как в старом switch).
+static void miBruteForce() {
+  rc12bitBruteForce();
+  ELECHOUSE_cc1101.goSleep();
+}
 
-const char* blue_lay[8] = {
-  "Keyboard",
-  "Mouse",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
+// --- Таблицы меню (реестр модулей). Добавить пункт = дописать одну строку. ---
+static const MenuItem mainMenu[] = {
+  {"RC Custom", rcLay},
+  {"RawData Read", rawLay},
+  {"Frequency Analyzer", detectSignal},
+  {"RC 12bit bruteForce", miBruteForce},
+  {"BLUETOOTH", bluetoothLay},
+  {"WIFI", wifiLay},
+  {"Temp", tempLay},
+  {"GPIO", gpioLay},
+  {"Settings", settings},
+  {"Games", games},
 };
+static const uint8_t mainMenuCount = sizeof(mainMenu) / sizeof(mainMenu[0]);
+
+static const MenuItem bluetoothMenu[] = {
+  {"Keyboard", selectKeyboard},
+  {"Mouse", selectMouse},
+};
+static const uint8_t bluetoothMenuCount = sizeof(bluetoothMenu) / sizeof(bluetoothMenu[0]);
 
 
 void setupRx() {
@@ -156,7 +164,7 @@ void setup() {
   drawLogo();
   oled.update();
 
-  for (int i = 0; i < pinsCount - 1; i++) {  // file GPIO.ino
+  for (int i = 0; i < pinsCounts; i++) {  // сброс режимов пользовательских GPIO
     OutPinModeG[i] = 0;
   }
 
@@ -178,14 +186,16 @@ void setup() {
   readJsonFromFile("/config.json", docConfigFile);
   Serial.println("ready");
 
-  // first start - ".as" to ".to"
+  // Привязываем корневые объекты к загруженным документам. Если файл отсутствовал
+  // или лежал в неверной форме (массив), .as<JsonObject>() вернёт null — тогда
+  // создаём объект-контейнер через .to<JsonObject>(). Существующие данные при этом
+  // не затираются (в отличие от безусловного .to<>()).
   objectDoc = doc["sensorData"].as<JsonObject>();  // frequency, name, RawData[]
+  if (objectDoc.isNull()) objectDoc = doc["sensorData"].to<JsonObject>();
   objectRC = docRC["data"].as<JsonObject>();       // frequency, name, data, bytes
-  objectConfigFile = docConfigFile["config"].as<JsonObject>();       // frequency, name, data, bytes
-
-  // objectDoc = doc["sensorData"].to<JsonObject>();  // frequency, name, RawData[]
-  // objectRC = docRC["data"].to<JsonObject>();       // frequency, name, data, bytes
-  // objectConfigFile = docConfigFile["config"].to<JsonObject>();       // frequency, name, data, bytes
+  if (objectRC.isNull()) objectRC = docRC["data"].to<JsonObject>();
+  objectConfigFile = docConfigFile["config"].as<JsonObject>();  // pik, pikHz, externalCCModule
+  if (objectConfigFile.isNull()) objectConfigFile = docConfigFile["config"].to<JsonObject>();
 
   // Buzzer
   pik = objectConfigFile["pik"].as<bool>();
@@ -193,7 +203,7 @@ void setup() {
 
   if (pik) setupBuzzer(pikHz);
   
-  ELECHOUSE_cc1101.setSpiPin(18, 19, 23, (objectConfigFile["externalССModule"].as<bool>() ? 13 : 5));
+  ELECHOUSE_cc1101.setSpiPin(18, 19, 23, (objectConfigFile["externalCCModule"].as<bool>() ? 13 : 5));
   ELECHOUSE_cc1101.Init();
   ELECHOUSE_cc1101.setMHZ(signalDetectionFrequencies[FrequencyPointer]);
   // ELECHOUSE_cc1101.setRxBW(58);
@@ -210,51 +220,8 @@ void loop() {
 }
 
 void mainn() {
-  bool displayUpdate = 1;
-  tk();
-  while (1) {
-    static uint8_t pointer = 0;
-    tk();
-    if (displayUpdate) {
-      displayUpdate = 0;
-      oled.clear();
-      oled.home();
-      for (uint8_t i = 0; i < 8; i++) {
-        oled.setCursor(14, i);
-        oled.print(main_lay[i]);
-      }
-      oled.setCursor(100, 0);
-      oled.print(getVolltage());  // volt * 3.26 * ((r1 + r2) / r2) / 4096
-      printPointer(pointer);
-      oled.update();
-    }
-
-    // ||||| Кнопки |||||
-    if (up.click() or up.step()) {
-      pointer = constrain(pointer - 1, 0, ITEMS - 1);
-      displayUpdate = 1;
-    }
-    if (down.click() or down.step()) {
-      pointer = constrain(pointer + 1, 0, ITEMS - 1);
-      displayUpdate = 1;
-    }
-    if (ok.click() or ok.hold()) {
-      switch (pointer) {
-        case 0: rcLay(); break;
-        case 1: rawLay(); break;
-        case 2: detectSignal(); break;
-        case 3:
-          rc12bitBruteForce();
-          ELECHOUSE_cc1101.goSleep();
-          break;
-        case 4: bluetoothLay(); break;
-        case 5: gpioLay(); break;
-        case 6: settings(); break;
-        case 7: games(); break;
-      }
-      displayUpdate = 1;
-    }
-  }
+  // Корневое меню, управляемое таблицей: не выходит по back, показывает напряжение.
+  runMenu(mainMenu, mainMenuCount, /*showVoltage=*/true, /*allowBack=*/false);
 }
 
 #pragma region RC RAW LAY
@@ -312,10 +279,13 @@ void rawLay() {
       String j = String(pointer);
       JsonDocument rawSignal;
       JsonArray RawSignalArray = rawSignal["RAW"].to<JsonArray>();
-      RecordSignal(pointer, RawSignalArray, objectDoc);
-      objectDoc[j]["RawData"] = "/raw"+j+".json";
-      saveJsonToFile("/raw.json", doc);
-      saveJsonToFile(objectDoc[j]["RawData"].as<const char*>(), rawSignal);
+      // Сохраняем запись только если она не была прервана кнопкой back —
+      // иначе в /raw.json попадала бы частичная запись без size/name/frequency.
+      if (RecordSignal(pointer, RawSignalArray, objectDoc)) {
+        objectDoc[j]["RawData"] = "/raw" + j + ".json";
+        saveJsonToFile("/raw.json", doc);
+        saveJsonToFile(objectDoc[j]["RawData"].as<const char*>(), rawSignal);
+      }
 
       ELECHOUSE_cc1101.goSleep();
       tk();
@@ -456,167 +426,105 @@ void rcLay() {
 
 #pragma region DETECT SYGNAL
 void detectSignal() {
-  setupRx();
-  // ELECHOUSE_cc1101.setRxBW(64);
-  byte signalDetected = 0;
-  bool changed = false;
-  detectedRssi = -100;
-  detectedFrequency = 0.0;
-  fineRssi = -100;
-  fineFrequency = 0.0;
-  oled.clear();
-  oled.home();
-  oled.print("Frequency Analyzer..");
-  oled.setCursor(0, 1);
-  oled.print("minRssi: ");
-  oled.print(minRssi);
-  oled.update();
-  while (signalDetected <= 5) {
-    tk();
-    if (back.click()) return;
-    if (ok.click()) {
-      detectSignal();
-      return;
-    }
-    if (up.click() or up.step()) {
-      minRssi++;
-      changed = true;
-    }
-    if (down.click() or down.step()) {
-      minRssi--;
-      changed = true;
-    }
-    if (changed) {
-      changed = false;
-      oled.setCursor(0, 1);
-      oled.print("minRssi: ");
-      oled.print(minRssi);
-      oled.update();
-    }
+  // Внешний цикл перезапуска заменяет прежнюю рекурсию detectSignal()->detectSignal(),
+  // которая наращивала стек при каждом нажатии OK (риск переполнения стека).
+  while (1) {
+    setupRx();
+    byte signalDetected = 0;
+    bool changed = false;
+    bool restart = false;
     detectedRssi = -100;
+    detectedFrequency = 0.0;
+    fineRssi = -100;
+    fineFrequency = 0.0;
+    oled.clear();
+    oled.home();
+    oled.print("Frequency Analyzer..");
+    oled.setCursor(0, 1);
+    oled.print("minRssi: ");
+    oled.print(minRssi);
+    oled.update();
 
-    for (float fMhz : signalDetectionFrequencies) {
-      ELECHOUSE_cc1101.setMHZ(fMhz);
-      int rssi = ELECHOUSE_cc1101.getRssi();
-      if (rssi >= detectedRssi) {
-        detectedRssi = rssi;
-        detectedFrequency = fMhz;
+    while (signalDetected <= 5) {
+      tk();
+      if (back.click()) return;
+      if (ok.click()) { restart = true; break; }
+      if (up.click() or up.step()) { minRssi++; changed = true; }
+      if (down.click() or down.step()) { minRssi--; changed = true; }
+      if (changed) {
+        changed = false;
+        oled.setCursor(0, 1);
+        oled.print("minRssi: ");
+        oled.print(minRssi);
+        oled.update();
       }
-    }
-    for (float fMhz : signalDetectionFrequencies) {
-      ELECHOUSE_cc1101.setMHZ(fMhz);
-      int rssi = ELECHOUSE_cc1101.getRssi();
-      if (rssi >= detectedRssi) {
-        detectedRssi = rssi;
-        detectedFrequency = fMhz;
-      }
-    }
+      detectedRssi = -100;
 
-    if (detectedRssi >= minRssi) {
-
-      for (float i = detectedFrequency - 0.3; i < detectedFrequency + 0.3; i += 0.02) {
-        float frequency = i;
-        ELECHOUSE_cc1101.setMHZ(frequency);
+      // Один проход по списку частот (раньше цикл был продублирован —
+      // удвоенные setMHZ()/getRssi() без пользы).
+      for (float fMhz : signalDetectionFrequencies) {
+        ELECHOUSE_cc1101.setMHZ(fMhz);
         int rssi = ELECHOUSE_cc1101.getRssi();
-
-        if (rssi >= fineRssi) {
-          fineRssi = rssi;
-          fineFrequency = frequency;
+        if (rssi >= detectedRssi) {
+          detectedRssi = rssi;
+          detectedFrequency = fMhz;
         }
       }
 
-      signalDetected++;
+      if (detectedRssi >= minRssi) {
+        for (float i = detectedFrequency - 0.3; i < detectedFrequency + 0.3; i += 0.02) {
+          ELECHOUSE_cc1101.setMHZ(i);
+          int rssi = ELECHOUSE_cc1101.getRssi();
+          if (rssi >= fineRssi) {
+            fineRssi = rssi;
+            fineFrequency = i;
+          }
+        }
 
-      // DEBUG
-      Serial.print("MHZ: ");
-      Serial.print(detectedFrequency);
-      Serial.print(" RSSI: ");
-      Serial.println(detectedRssi);
+        signalDetected++;
 
-      Serial.print("Fine MHZ: ");
-      Serial.print(fineFrequency);
-      Serial.print(" Fine RSSI: ");
-      Serial.println(fineRssi);
+        FTC_LOG("MHZ: "); FTC_LOG(detectedFrequency);
+        FTC_LOG(" RSSI: "); FTC_LOGLN(detectedRssi);
+        FTC_LOG("Fine MHZ: "); FTC_LOG(fineFrequency);
+        FTC_LOG(" Fine RSSI: "); FTC_LOGLN(fineRssi);
 
-      oled.setCursor(0, 1 + signalDetected);
-      // oled.print("M: ");
-      oled.print(detectedFrequency);
-      oled.print(",");
-      oled.print(detectedRssi);
-      oled.print(" ");
-      oled.print(fineFrequency);
-      oled.print(",");
-      oled.println(fineRssi);
-      oled.update();
-      delay(1);
+        oled.setCursor(0, 1 + signalDetected);
+        oled.print(detectedFrequency);
+        oled.print(",");
+        oled.print(detectedRssi);
+        oled.print(" ");
+        oled.print(fineFrequency);
+        oled.print(",");
+        oled.println(fineRssi);
+        oled.update();
+        delay(1);
+      }
     }
-  }
-  while (1) {
-    tk();
-    if (back.click()) return;
-    if (ok.click()) {
-      detectSignal();
-      return;
+    if (restart) continue;
+
+    // Экран удержания результатов: OK — новый скан, Back — выход.
+    while (1) {
+      tk();
+      if (back.click()) return;
+      if (ok.click()) { restart = true; break; }
+      if (up.click()) { minRssi++; changed = true; }
+      if (down.click()) { minRssi--; changed = true; }
+      if (changed) {
+        changed = false;
+        oled.setCursor(0, 1);
+        oled.print("minRssi: ");
+        oled.print(minRssi);
+        oled.update();
+      }
     }
-    if (up.click()) {
-      minRssi++;
-      changed = true;
-    }
-    if (down.click()) {
-      minRssi--;
-      changed = true;
-    }
-    if (changed) {
-      changed = false;
-      oled.setCursor(0, 1);
-      oled.print("minRssi: ");
-      oled.print(minRssi);
-      oled.update();
-    }
+    if (restart) continue;
+    return;
   }
 }
 
 #pragma region BLUETOOTH
 void bluetoothLay() {
-  static uint8_t pointer = 0;
-  bool displayUpdate = 1;
-  while (1) {
-    tk();
-    if (displayUpdate != 0) {
-      displayUpdate = 0;
-      oled.clear();
-      oled.home();
-      for (uint8_t i = 0; i < 8; i++) {
-        oled.setCursor(14, i);
-        oled.print(blue_lay[i]);
-      }
-      printPointer(pointer);
-      oled.update();
-    }
-
-    if (up.click() or up.step()) {
-      pointer = constrain(pointer - 1, 0, ITEMS - 1);
-      displayUpdate = 1;
-    }
-    if (down.click() or down.step()) {
-      pointer = constrain(pointer + 1, 0, ITEMS - 1);
-      displayUpdate = 1;
-    }
-    if (back.click() or back.hold()) break;
-    if (ok.click() or ok.hold()) {
-      switch (pointer) {
-        case 0: selectKeyboard(); break;  // selectKeyboard()
-        case 1: selectMouse(); break;
-        case 2: nothing(); break;
-        case 3: nothing(); break;
-        case 4: nothing(); break;
-        case 5: nothing(); break;
-        case 6: nothing(); break;
-        case 7: nothing(); break;
-      }
-      displayUpdate = 1;
-    }
-  }
+  runMenu(bluetoothMenu, bluetoothMenuCount);
 }
 
 
@@ -625,7 +533,7 @@ void bluetoothLay() {
 #pragma region RC MENU
 void menuRc(uint8_t pointer1) {
   String j = String(pointer1);
-  static uint8_t pointer = 3;
+  uint8_t pointer = 3;  // не static: подменю открывается на первом пункте
   bool updDisplay = true;
   while (1) {
     tk();
@@ -693,7 +601,7 @@ void menuRc(uint8_t pointer1) {
 #pragma region DELETE RC LAY
 void deleteRC(int pointer1) {
   String j = String(pointer1);
-  static uint8_t pointer = 1;
+  uint8_t pointer = 1;  // не static: диалог удаления всегда открывается на "No"
   bool updDisplay = 1;
   while (1) {
     tk();
@@ -863,64 +771,44 @@ void rc12bitBruteForce() {
   oled.update();
 
   uint8_t byt = 12;
-  int iy = 1;
-  for (int i = start12bitBruteForce; i < 4096; i++) {
+  // Начальный код перебора кодов ограничиваем диапазоном [1, 4095]: значение 0
+  // раньше зацикливало формирователь отступов (0*10 == 0 < 1000 всегда истинно).
+  int iy = constrain(start12bitBruteForce, 1, 4095);
+  for (int i = iy; i < 4096; i++) {
     tk();
-    if (back.click() or back.hold()) {
-
-      // mySwitch.setPulseLength(350);
-      return;
-    }
+    if (back.click() or back.hold()) return;
     if (ok.click() or ok.hold()) break;
-    // oled.clear();
     mySwitch.send(i, byt);
     iy = i;
     oled.setCursor(0, 4);
     oled.print("     ");
-    int draw = i;
-    while (draw < 1000) {
-      draw *= 10;
-      oled.print(" ");
-    }
+    for (long draw = i; draw > 0 && draw < 1000; draw *= 10) oled.print(" ");
     oled.print(i);
     oled.print("/4096      ");
     oled.update();
   }
 
+  bool upd = 1;  // не static: не переносим состояние между входами в экран
   while (1) {
-    static bool upd = 1;
     tk();
-    if (back.click() or back.hold()) {
-      // mySwitch.setPulseLength(350);
-      return;
-    };
+    if (back.click() or back.hold()) return;
     if (ok.click() or ok.hold()) {
       func_custom_translate(iy, byt);
       ELECHOUSE_cc1101.goSleep();
       upd = 1;
     }
-    if (up.click()) {
-      iy++;
-      upd = 1;
-    }
-    if (down.click()) {
-      iy--;
-      upd = 1;
-    }
+    // iy жёстко ограничен [1, 4095] — иначе отрицательное/нулевое значение
+    // вызывало вечный цикл отрисовки и срабатывание watchdog.
+    if (up.click())   { iy = constrain(iy + 1, 1, 4095); upd = 1; }
+    if (down.click()) { iy = constrain(iy - 1, 1, 4095); upd = 1; }
     if (upd) {
       upd = 0;
       oled.setCursor(0, 4);
       oled.print("     ");
-      long draw = iy;
-      while (draw < 1000) {
-        draw *= 10;
-        oled.print(" ");
-      }
+      for (long draw = iy; draw > 0 && draw < 1000; draw *= 10) oled.print(" ");
       oled.print(iy);
       oled.print("/4096      ");
       oled.update();
     }
   }
-
-  // mySwitch.setPulseLength(350);
 }
